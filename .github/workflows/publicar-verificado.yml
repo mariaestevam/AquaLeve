@@ -1,0 +1,68 @@
+name: Publicar ZIP verificado
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publicar:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Conferir execucao e hash antes de publicar
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $run = gh api repos/mariaestevam/AquaLeve/actions/runs/42440659932 | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0 -or $run.conclusion -ne 'success' -or $run.head_sha -ne 'aa3a1ecb564ec885c0798dfb63b3d34e3a463339') {
+            throw 'Execucao aprovada nao confirmada. Publicacao bloqueada.'
+          }
+          gh run download 42440659932 --repo mariaestevam/AquaLeve --name AquaLeve-verificado-no-Windows --dir pacote
+          if ($LASTEXITCODE -ne 0) { throw 'Falha ao obter artefato aprovado' }
+          $hash = (Get-FileHash pacote/AquaLeve.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne '8c5496ea5bf8fc111162b51c4c730ed14b42507f2913af0b010a3b95f422fa24') {
+            throw 'Hash divergente; publicacao bloqueada.'
+          }
+          "$hash  AquaLeve.zip" | Set-Content pacote/AquaLeve.zip.sha256 -Encoding ascii
+          @'
+          {
+            "projeto": "AquaLeve",
+            "commit": "aa3a1ecb564ec885c0798dfb63b3d34e3a463339",
+            "execucao": "https://github.com/mariaestevam/AquaLeve/actions/runs/42440659932",
+            "resultado": "success",
+            "defender_motor": "4.18.26100.4",
+            "defender_assinaturas": "1.463.184.0",
+            "deteccoes_registradas": 0,
+            "testes": 35,
+            "falhas": 0,
+            "erros": 0,
+            "arquivo": "AquaLeve.zip",
+            "sha256": "8c5496ea5bf8fc111162b51c4c730ed14b42507f2913af0b010a3b95f422fa24",
+            "sha256_artefato_github": "8a6550871c72b74db75b1e497892d92287b7f436a7cd4bc031606df3139068df",
+            "nota": "Resultado desta execução; não é garantia contra alertas futuros ou equivalência à configuração do computador do usuário."
+          }
+          
+          '@ | Set-Content pacote/VALIDACAO-WINDOWS.json -Encoding utf8
+          @'
+          AquaLeve em Java/Spring Boot, Thymeleaf e PostgreSQL, com a interface enviada integrada e as funcionalidades preservadas.
+          
+          Esta distribuição remove o ZIP aninhado e os scripts de download automático do Maven. Para executar, instale JDK 17+, Apache Maven 3.9+ e PostgreSQL; siga o README e configure suas credenciais apenas localmente.
+          
+          Validação desta versão:
+          
+          - Microsoft Defender atualizado no Windows: nenhuma detecção registrada nos fontes ou no ZIP nesta execução.
+          - `mvn clean verify` em Java 17 no Windows: 35 testes, zero falhas e zero erros; compilação aprovada.
+          - O arquivo AquaLeve.zip é o artefato examinado no Windows, sem recompactação.
+          - SHA-256 em AquaLeve.zip.sha256; detalhes em VALIDACAO-WINDOWS.json.
+          
+          Execução e commit: https://github.com/mariaestevam/AquaLeve/actions/runs/42440659932 — aa3a1ecb564ec885c0798dfb63b3d34e3a463339.
+          
+          O resultado corresponde a essa execução e às assinaturas registradas; não garante ausência de alertas em outras configurações ou atualizações futuras. Se o seu antivírus bloquear o arquivo, mantenha o bloqueio e envie os detalhes. Não desative proteções nem crie exclusões.
+          
+          Baixe o arquivo **AquaLeve.zip** na lista de assets desta versão. Ele contém a pasta AquaLeve com o projeto; não contém senhas locais ou o banco pessoal.
+          
+          '@ | Set-Content notas.md -Encoding utf8
+          gh release create v1.0.0-revisado --repo mariaestevam/AquaLeve --target aa3a1ecb564ec885c0798dfb63b3d34e3a463339 --title 'AquaLeve - distribuicao revisada e verificada no Windows' --notes-file notas.md pacote/AquaLeve.zip pacote/AquaLeve.zip.sha256 pacote/VALIDACAO-WINDOWS.json
+          if ($LASTEXITCODE -ne 0) { throw 'Falha ao publicar release' }
