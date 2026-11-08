@@ -1,0 +1,48 @@
+name: Verificar AquaLeve no Windows
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verificar:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Preparar ZIP somente do codigo-fonte
+        shell: pwsh
+        run: |
+          git archive --format=zip --prefix=AquaLeve/ --output="$env:RUNNER_TEMP/AquaLeve.zip" HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'Falha ao gerar ZIP' }
+      - name: Atualizar e verificar com Microsoft Defender
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $status = Get-MpComputerStatus
+          if (-not $status.AntivirusEnabled -or -not $status.AMServiceEnabled) {
+            throw 'Microsoft Defender indisponivel neste runner; verificacao nao realizada.'
+          }
+          Update-MpSignature
+          Get-MpComputerStatus | Select-Object AMProductVersion, AntivirusSignatureVersion, AntivirusSignatureLastUpdated
+          Start-MpScan -ScanType CustomScan -ScanPath $env:GITHUB_WORKSPACE
+          Start-MpScan -ScanType CustomScan -ScanPath "$env:RUNNER_TEMP/AquaLeve.zip"
+          $deteccoes = @(Get-MpThreatDetection)
+          if ($deteccoes.Count -gt 0) {
+            $deteccoes | Format-List ThreatID, Resources, ActionSuccess
+            throw 'Defender registrou deteccao. Artefato nao sera disponibilizado.'
+          }
+          Get-FileHash "$env:RUNNER_TEMP/AquaLeve.zip" -Algorithm SHA256
+      - name: Testar e compilar em Java 17
+        shell: pwsh
+        run: |
+          $env:JAVA_HOME = $env:JAVA_HOME_17_X64
+          $env:PATH = "$env:JAVA_HOME/bin;$env:PATH"
+          mvn --batch-mode clean verify
+          if ($LASTEXITCODE -ne 0) { throw 'Falha nos testes ou compilacao' }
+      - name: Disponibilizar ZIP apos verificacoes aprovadas
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: AquaLeve-verificado-no-Windows
+          path: ${{ runner.temp }}/AquaLeve.zip
+          if-no-files-found: error
+          retention-days: 14

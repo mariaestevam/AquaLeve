@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Sobre o AquaLeve')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('sobre')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main>
+    <section class="hero">
+        <img th:src="@{/imagens/prainha-hero.jpg}" alt="Água doce e natureza no interior paulista" width="1920" height="1024">
+        <div class="container hero-content">
+            <svg class="i i-xl cor-sol" style="margin-bottom:20px"><use href="#i-waves"/></svg>
+            <h1>AquaLeve</h1>
+            <p>Gestão de Prainhas.<br>A tecnologia aproximando você dos seus melhores momentos na natureza.</p>
+        </div>
+    </section>
+
+    <section class="container sobre-grade">
+        <div>
+            <h2>Uma ideia que nasceu no interior</h2>
+            <p>O AquaLeve é um projeto de Informática para Internet da Escola Técnica Estadual Professor Armando José Farinazzo, em Fernandópolis. Sua proposta é reunir informações sobre as prainhas de água doce do Noroeste de São Paulo e facilitar a organização de espaços e reservas.</p>
+            <p style="margin-top:16px">Desenvolvido por Luan Hygor Pereira, Luiz Jhonatan da Silva Tavares, Maria Eduarda Estevam Pereira e Maria Júlia Bordin de Jesus, sob orientação da professora Josilene Pacheco.</p>
+            <a class="btn" style="margin-top:24px" th:href="@{/prainhas}">Explorar prainhas <svg class="i"><use href="#i-map-pin"/></svg></a>
+        </div>
+        <div class="lado">
+            <svg class="i i-xl cor-agua" style="margin-bottom:20px;width:28px;height:28px"><use href="#i-leaf"/></svg>
+            <h2>Simples, próximo e transparente</h2>
+            <p>Nossa missão é facilitar o acesso às informações das prainhas e apoiar seus responsáveis na gestão dos espaços. Valorizamos praticidade, acessibilidade e turismo regional.</p>
+            <p style="margin-top:24px;font-size:12px;line-height:24px">Os cadastros oficiais de prainhas, datas e eventos são feitos e validados pelos administradores do AquaLeve.</p>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

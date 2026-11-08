@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Reserva administrativa')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('admin')}"></header>
+<main class="container pagina-estreita">
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<div class="form-card largo" style="max-width:640px">
+    <h1 th:text="${titulo}">Reserva</h1>
+    <p>Só é possível reservar em datas liberadas no calendário e em espaços ainda livres.</p>
+    <form th:action="@{${acao}}" th:object="${reservaForm}" method="post" novalidate>
+        <div class="campo">
+            <label for="clienteId">Cliente</label>
+            <select id="clienteId" th:field="*{clienteId}">
+                <option value="">Selecione...</option>
+                <option th:each="c : ${clientes}" th:value="${c.idCliente}" th:text="${c.nomeCliente + ' — ' + c.emailCliente}"></option>
+            </select>
+            <small class="erro-campo" th:if="${#fields.hasErrors('clienteId')}" th:errors="*{clienteId}"></small>
+        </div>
+        <div class="campo">
+            <label for="prainhaId">Prainha</label>
+            <select id="prainhaId" th:field="*{prainhaId}">
+                <option value="">Selecione...</option>
+                <option th:each="p : ${prainhas}" th:value="${p.idPrainha}"
+                        th:text="${p.nomePrainha + ' — ' + p.cidadePrainha}">Prainha</option>
+            </select>
+            <small class="erro-campo" th:if="${#fields.hasErrors('prainhaId')}" th:errors="*{prainhaId}"></small>
+        </div>
+        <div class="linha-form">
+            <div class="campo">
+                <label for="tipoReserva">Tipo de espaço</label>
+                <select id="tipoReserva" th:field="*{tipoReserva}">
+                    <option value="">Selecione...</option>
+                    <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}">QUIOSQUE</option>
+                </select>
+                <small class="erro-campo" th:if="${#fields.hasErrors('tipoReserva')}" th:errors="*{tipoReserva}"></small>
+            </div>
+            <div class="campo">
+                <label for="capacidadeReserva">Número de pessoas</label>
+                <input type="number" id="capacidadeReserva" min="1" th:field="*{capacidadeReserva}">
+                <small class="erro-campo" th:if="${#fields.hasErrors('capacidadeReserva')}" th:errors="*{capacidadeReserva}"></small>
+            </div>
+        </div>
+        <div class="campo">
+            <label for="dataHora">Data e horário</label>
+            <input type="datetime-local" id="dataHora" th:field="*{dataHora}">
+            <small class="erro-campo" th:if="${#fields.hasErrors('dataHora')}" th:errors="*{dataHora}"></small>
+        </div>
+        <div class="acoes-form"><button class="btn" type="submit">Confirmar reserva</button>
+        <a class="btn btn-outline" th:href="@{/reservas/listar}">Cancelar</a></div>
+    </form>
+</div>
+</main>
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

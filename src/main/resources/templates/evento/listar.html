@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Eventos')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu(${usuario != null and usuario.administrador} ? 'admin' : 'eventos')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container" th:classappend="${usuario != null and usuario.administrador} ? 'pagina-estreita' : 'pagina'">
+
+    <!-- ===== Topo ===== -->
+    <th:block th:if="${usuario != null and usuario.administrador}">
+        <div th:replace="~{fragmentos/layout :: adminTopo('eventos')}"></div>
+    </th:block>
+    <div class="titulo-pagina" th:unless="${usuario != null and usuario.administrador}">
+        <div>
+            <div class="sobretitulo"><span class="traco"></span>Agenda das prainhas</div>
+            <h1>Eventos</h1>
+            <p class="subtitulo">Festas da cidade, feriados e programações especiais que acontecem nas prainhas.</p>
+        </div>
+    </div>
+
+    <!-- ===== Cadastro (administrador) ===== -->
+    <div class="painel" style="margin-bottom:32px" th:if="${usuario != null and usuario.administrador}">
+        <div class="painel-titulo">
+            <svg class="i i-lg cor-agua"><use href="#i-calendar-plus"/></svg>
+            <h2>Cadastrar evento</h2>
+        </div>
+        <p class="ajuda" style="margin:-8px 0 16px" th:if="${datas.isEmpty()}">
+            Para cadastrar um evento, primeiro libere uma data no <a class="btn-link" th:href="@{/calendarios}">calendário</a>.
+        </p>
+        <form th:action="@{/eventos/salvar}" th:object="${eventoForm}" method="post" novalidate>
+            <div class="linha-form" style="grid-template-columns:1.2fr 1fr">
+                <div class="campo" th:classappend="${#fields.hasErrors('calendarioId')} ? 'com-erro'">
+                    <label for="calendarioId">Prainha e data liberada</label>
+                    <select id="calendarioId" th:field="*{calendarioId}">
+                        <option value="">Selecione</option>
+                        <option th:each="d : ${datas}" th:value="${d.idCalendario}"
+                                th:text="${d.prainha.nomePrainha + ' — ' + #temporals.format(d.dataDisponivel, 'dd/MM/yyyy')}">Prainha — 01/01/2026</option>
+                    </select>
+                    <small class="erro-campo" th:if="${#fields.hasErrors('calendarioId')}" th:errors="*{calendarioId}"></small>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('dataEvento')} ? 'com-erro'">
+                    <label for="dataEvento">Data do evento</label>
+                    <input type="date" id="dataEvento" th:field="*{dataEvento}">
+                    <small class="erro-campo" th:if="${#fields.hasErrors('dataEvento')}" th:errors="*{dataEvento}"></small>
+                </div>
+            </div>
+            <div class="campo" style="margin-top:16px" th:classappend="${#fields.hasErrors('descricaoEvento')} ? 'com-erro'">
+                <label for="descricaoEvento">Descrição do evento</label>
+                <input type="text" id="descricaoEvento" th:field="*{descricaoEvento}" placeholder="Ex.: Festa de aniversário da cidade com shows na orla">
+                <small class="erro-campo" th:if="${#fields.hasErrors('descricaoEvento')}" th:errors="*{descricaoEvento}"></small>
+            </div>
+            <div class="acoes-form" style="justify-content:flex-start">
+                <button class="btn" type="submit" style="flex:0 0 auto"><svg class="i"><use href="#i-clipboard-check"/></svg>Salvar evento</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ===== Calendário + próximos ===== -->
+    <div class="eventos-grade">
+        <div class="calendario" data-calendario>
+            <ul hidden>
+                <li th:each="e : ${eventos}" data-cal-item data-tipo="evento" th:data-data="${e.dataEvento}"
+                    th:data-titulo="${e.descricaoEvento}" th:data-sub="${e.calendario.prainha.nomePrainha + ' · ' + e.calendario.prainha.cidadePrainha}"></li>
+            </ul>
+            <div class="cal-topo">
+                <button type="button" class="btn btn-ghost btn-icone" data-cal-anterior aria-label="Mês anterior"><svg class="i"><use href="#i-chevron-left"/></svg></button>
+                <p data-cal-titulo>mês</p>
+                <button type="button" class="btn btn-ghost btn-icone" data-cal-proximo aria-label="Próximo mês"><svg class="i"><use href="#i-chevron-right"/></svg></button>
+            </div>
+            <div class="cal-semana"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
+            <div class="cal-dias" data-cal-dias></div>
+            <div class="cal-selecao" data-cal-selecao hidden></div>
+            <div class="cal-legenda"><span><i class="l-evento"></i>Dia com evento — toque para ver</span></div>
+        </div>
+
+        <div class="proximos">
+            <h3><svg class="i i-md cor-sol"><use href="#i-party-popper"/></svg>Próximos eventos</h3>
+            <div class="vazio compacto" style="text-align:left" th:if="${eventos.isEmpty()}">
+                <svg class="i i-lg" style="margin:0 0 12px"><use href="#i-calendar-days"/></svg>
+                <p>Nenhum evento programado no momento. Volte em breve!</p>
+            </div>
+            <div class="lista-eventos" th:unless="${eventos.isEmpty()}">
+                <article class="evento-item" th:each="e : ${eventos}" th:if="${!e.dataEvento.isBefore(#temporals.createToday())}">
+                    <div class="data-bolha">
+                        <b th:text="${e.dataEvento.dayOfMonth}">10</b>
+                        <span th:text="${@visual.mesCurto(e.dataEvento)}">nov</span>
+                    </div>
+                    <div>
+                        <p class="titulo" th:text="${e.descricaoEvento}">Evento</p>
+                        <p class="sub">
+                            <span th:text="${@visual.dataExtenso(e.dataEvento)}">10 de novembro</span> ·
+                            <a class="btn-link" style="font-size:12px" th:href="@{/prainhas/{id}(id=${e.calendario.prainha.idPrainha})}" th:text="${e.calendario.prainha.nomePrainha}">Prainha</a>
+                        </p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Tabela de gestão (administrador) ===== -->
+    <th:block th:if="${usuario != null and usuario.administrador}">
+        <div class="secao-admin-topo" style="margin-top:48px"><h2>Calendário de eventos</h2></div>
+        <div class="tabela-rolagem">
+            <table class="admin-table">
+                <thead><tr><th>Evento</th><th>Prainha</th><th>Data</th><th>Ações</th></tr></thead>
+                <tbody>
+                <tr th:each="e : ${eventos}">
+                    <td><strong style="font-weight:500" th:text="${e.descricaoEvento}">Evento</strong></td>
+                    <td th:text="${e.calendario.prainha.nomePrainha}">Prainha</td>
+                    <td th:text="${#temporals.format(e.dataEvento, 'dd/MM/yyyy')}">01/01/2026</td>
+                    <td class="acoes">
+                        <form class="inline" th:action="@{/eventos/excluir/{id}(id=${e.idEvento})}" method="post"
+                              data-confirmar="Excluir este evento?" data-confirmar-ok="Excluir evento">
+                            <button class="btn btn-ghost btn-icone btn-sm cor-perigo" type="submit" title="Excluir evento" aria-label="Excluir evento"><svg class="i"><use href="#i-trash-2"/></svg></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="vazio compacto" th:if="${eventos.isEmpty()}">Nenhum evento cadastrado.</p>
+        </div>
+    </th:block>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

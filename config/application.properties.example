@@ -1,0 +1,12 @@
+# Copie para config/application.properties, preencha os campos e inicie na raiz do projeto.
+# O arquivo local config/application.properties não deve ser publicado no Git.
+spring.datasource.url=jdbc:postgresql://localhost:5432/bdaqualeve
+spring.datasource.username=postgres
+spring.datasource.password=
+
+# Gere e preencha uma chave aleatória de pelo menos 32 caracteres.
+aqualeve.jwt.secret=
+
+# E-mail e senha escolhidos por você para o administrador inicial.
+aqualeve.admin.email=
+aqualeve.admin.senha=

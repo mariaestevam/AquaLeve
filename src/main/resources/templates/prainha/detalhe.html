@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho(${prainha.nomePrainha})}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('prainhas')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container pagina-estreita">
+    <a class="voltar" th:href="@{/prainhas}"><svg class="i"><use href="#i-arrow-left"/></svg>Explorar prainhas</a>
+
+    <!-- ===== Topo ===== -->
+    <div class="detalhe-topo">
+        <div>
+            <p class="local"><svg class="i"><use href="#i-map-pin"/></svg><span th:text="${prainha.cidadePrainha} + ', São Paulo'">Cidade, São Paulo</span></p>
+            <h1 th:text="${prainha.nomePrainha}">Prainha</h1>
+            <p class="meta">
+                <th:block th:if="${media != null}">
+                    <span class="estrelas">★ <span th:text="${#numbers.formatDecimal(media, 1, 1)}">5,0</span></span>
+                    <span th:text="${avaliacoes.size()} + (${avaliacoes.size() == 1} ? ' avaliação' : ' avaliações')">3 avaliações</span>
+                </th:block>
+                <span th:if="${media == null}">Ainda sem avaliações</span>
+            </p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span class="selo" th:if="${@visual.fotoReal(prainha)}">Foto real da prainha</span>
+            <a class="btn btn-outline" th:if="${usuario != null and usuario.administrador}" th:href="@{/prainhas/editar/{id}(id=${prainha.idPrainha})}">
+                <svg class="i"><use href="#i-pencil"/></svg>Editar prainha
+            </a>
+        </div>
+    </div>
+    <img class="foto-destaque" th:with="foto=${@visual.foto(prainha)},fotoAlternativa=${@visual.fotoReserva(prainha)}" th:src="@{${foto}}" th:data-fallback="@{${fotoAlternativa}}" onerror="aqFallback(this)"
+         th:alt="${prainha.nomePrainha}" width="1920" height="1024">
+
+    <div class="detalhe">
+        <!-- ===== Coluna de informações ===== -->
+        <div>
+            <h2>Um dia mais leve começa aqui</h2>
+            <p class="ajuda" th:if="${prainha.administrador != null}">Administração responsável: <strong th:text="${prainha.administrador.nomeAdministrador}"></strong></p>
+            <p class="texto-corrido" th:text="${prainha.descricaoPrainha}">Descrição</p>
+
+            <h2 class="mt-9">Infraestrutura e serviços</h2>
+            <div class="lista-checks">
+                <div th:each="sv : ${@visual.servicos(prainha)}">
+                    <svg class="i cor-agua"><use href="#i-check"/></svg><span th:text="${sv}">Serviço</span>
+                </div>
+            </div>
+
+            <h2 class="mt-9">Espaços da prainha</h2>
+            <p class="ajuda" style="margin-top:6px" th:if="${disponibilidade != null and disponibilidade.diaLiberado}"
+               th:text="'Situação em ' + ${#temporals.format(dataConsulta, 'dd/MM/yyyy')}">Situação no dia</p>
+            <div class="lista-espacos">
+                <div th:each="t : ${tipos}">
+                    <div class="nome">
+                        <svg class="i i-md cor-agua"><use th:with="nomeIcone=${@visual.iconeTipo(t)}" th:href="'#i-' + ${nomeIcone}"/></svg>
+                        <div>
+                            <p th:text="${@visual.rotuloTipo(t)}">Quiosque</p>
+                            <span th:text="${@visual.descricaoTipo(t)}">Descrição</span>
+                        </div>
+                    </div>
+                    <th:block th:if="${disponibilidade != null and disponibilidade.diaLiberado}">
+                        <span class="status status-cancelada" th:if="${disponibilidade.tiposOcupados.contains(t)}">Reservado</span>
+                        <span class="status" th:unless="${disponibilidade.tiposOcupados.contains(t)}">Disponível</span>
+                    </th:block>
+                    <span class="ajuda" th:unless="${disponibilidade != null and disponibilidade.diaLiberado}">Consulte a data</span>
+                </div>
+            </div>
+
+            <h2 class="mt-9">Localização</h2>
+            <p class="texto-corrido" style="margin-top:16px" th:text="${prainha.cidadePrainha} + ' · Noroeste Paulista'">Cidade · Noroeste Paulista</p>
+            <a class="btn btn-outline" style="margin-top:16px" target="_blank" rel="noreferrer"
+               th:href="'https://www.google.com/maps/search/?api=1&query=' + ${#uris.escapeQueryParam(prainha.nomePrainha + ' ' + prainha.cidadePrainha + ' SP')}">
+                <svg class="i"><use href="#i-map-pin"/></svg>Ver no mapa<svg class="i"><use href="#i-external-link"/></svg>
+            </a>
+        </div>
+
+        <!-- ===== Coluna de reserva ===== -->
+        <aside class="painel aside-reserva" id="reservar">
+            <div class="painel-titulo">
+                <svg class="i i-lg cor-agua"><use href="#i-calendar-days"/></svg>
+                <h2>Reserve seu espaço</h2>
+            </div>
+
+            <!-- 1) Consultar disponibilidade -->
+            <form th:action="@{/prainhas/{id}(id=${prainha.idPrainha})} + '#reservar'" method="get" class="form-pilha">
+                <label class="campo">Data da visita
+                    <input type="date" name="data" th:value="${dataConsulta}" required>
+                </label>
+                <button class="btn btn-outline btn-bloco" type="submit"><svg class="i"><use href="#i-search"/></svg>Consultar disponibilidade</button>
+            </form>
+
+            <div th:unless="${datas.isEmpty()}" style="margin-top:16px">
+                <p class="ajuda">Datas liberadas para reserva:</p>
+                <div class="datas-liberadas">
+                    <a th:each="d, it : ${datas}" th:if="${it.index < 10}"
+                       th:href="@{/prainhas/{id}(id=${prainha.idPrainha},data=${d.dataDisponivel})} + '#reservar'"
+                       th:classappend="${dataConsulta != null and dataConsulta.equals(d.dataDisponivel)} ? 'ativo'"
+                       th:text="${#temporals.format(d.dataDisponivel, 'dd/MM')}">01/01</a>
+                </div>
+            </div>
+            <p class="ajuda" style="margin-top:16px" th:if="${datas.isEmpty()}">Nenhuma data liberada no momento. Volte em breve!</p>
+
+            <!-- 2) Resultado da consulta -->
+            <div th:if="${disponibilidade != null}" style="margin-top:20px">
+                <div class="msg erro" th:unless="${disponibilidade.diaLiberado}">
+                    <svg class="i"><use href="#i-circle-alert"/></svg>Esta data não está liberada para reservas. Escolha uma das datas acima.
+                </div>
+                <th:block th:if="${disponibilidade.diaLiberado}">
+                    <div class="msg sucesso" th:if="${disponibilidade.tiposOcupados.isEmpty()}">
+                        <svg class="i"><use href="#i-circle-check"/></svg>Data liberada: todos os espaços estão disponíveis.
+                    </div>
+                    <div class="msg info" th:unless="${disponibilidade.tiposOcupados.isEmpty()}">
+                        <svg class="i"><use href="#i-info"/></svg>
+                        <span>Data liberada. Já reservados:
+                            <strong th:each="o, it : ${disponibilidade.tiposOcupados}" th:text="${@visual.rotuloTipo(o)} + (${it.last} ? '' : ', ')">Quiosque</strong></span>
+                    </div>
+                </th:block>
+            </div>
+
+            <!-- 3) Fazer a reserva (cliente logado, data liberada) -->
+            <form th:if="${usuario != null and usuario.cliente and disponibilidade != null and disponibilidade.diaLiberado and disponibilidade.tiposOcupados.size() < tipos.size()}"
+                  th:action="@{/reservas/salvar}" method="post" class="form-pilha" data-data-hora style="border-top:1px solid var(--borda);padding-top:20px;margin-top:4px">
+                <input type="hidden" name="prainhaId" th:value="${prainha.idPrainha}">
+                <input type="hidden" name="dataHora" th:value="${dataConsulta} + 'T08:00'">
+                <input type="hidden" th:value="${dataConsulta}" data-dia-reserva>
+                <label class="campo">Espaço
+                    <select name="tipoReserva" required>
+                        <option value="">Selecione um espaço</option>
+                        <option th:each="t : ${tipos}" th:value="${t}" th:disabled="${disponibilidade.tiposOcupados.contains(t)}"
+                                th:text="${@visual.rotuloTipo(t)} + (${disponibilidade.tiposOcupados.contains(t)} ? ' · reservado' : ' · disponível')">Quiosque</option>
+                    </select>
+                </label>
+                <div class="linha-form">
+                    <label class="campo">Horário de chegada
+                        <input type="time" value="08:00" data-hora-reserva required>
+                    </label>
+                    <label class="campo">Pessoas
+                        <input type="number" name="capacidadeReserva" min="1" required
+                               th:value="${param.pessoas != null ? param.pessoas[0] : 1}">
+                    </label>
+                </div>
+                <div class="linha-total">
+                    <span>Data da visita</span>
+                    <strong th:text="${#temporals.format(dataConsulta, 'dd/MM/yyyy')}">01/01/2026</strong>
+                </div>
+                <button class="btn btn-lg btn-bloco" type="submit"><svg class="i"><use href="#i-calendar-check"/></svg>Confirmar reserva</button>
+            </form>
+
+            <p class="ajuda" style="margin-top:16px" th:if="${usuario != null and usuario.cliente and disponibilidade == null and !datas.isEmpty()}">
+                Escolha uma data liberada para ver os espaços livres e reservar.
+            </p>
+
+            <!-- Visitante -->
+            <div th:if="${usuario == null}" style="margin-top:20px">
+                <a class="btn btn-lg btn-bloco" th:href="@{/login}"><svg class="i"><use href="#i-log-in"/></svg>Entrar para reservar</a>
+                <p class="ajuda" style="margin-top:10px;text-align:center">Ainda não tem conta? <a class="btn-link" th:href="@{/cadastro}">Cadastre-se</a></p>
+            </div>
+            <!-- Administrador -->
+            <div th:if="${usuario != null and usuario.administrador}" style="margin-top:20px">
+                <a class="btn btn-outline btn-bloco" th:href="@{/calendarios}"><svg class="i"><use href="#i-calendar-plus"/></svg>Liberar datas no calendário</a>
+            </div>
+
+            <p class="ajuda" style="margin-top:16px;font-size:11px;line-height:1.6">Só é possível reservar em datas liberadas, um espaço de cada tipo por dia.</p>
+        </aside>
+    </div>
+
+    <!-- ===== Eventos ===== -->
+    <section class="secao">
+        <div class="secao-titulo">
+            <svg class="i i-md cor-sol"><use href="#i-party-popper"/></svg>
+            <h2 th:text="'Eventos em ' + ${prainha.cidadePrainha}">Eventos</h2>
+        </div>
+        <p class="subtitulo">Festas da cidade, feriados e programações especiais que acontecem na prainha.</p>
+
+        <div class="eventos-grade" style="margin-top:24px">
+            <div class="calendario" data-calendario th:data-link-data="@{/prainhas/{id}(id=${prainha.idPrainha})} + '?data='">
+                <ul hidden>
+                    <li th:each="d : ${datas}" data-cal-item data-tipo="liberado" th:data-data="${d.dataDisponivel}"></li>
+                    <li th:each="e : ${eventos}" data-cal-item data-tipo="evento" th:data-data="${e.dataEvento}"
+                        th:data-titulo="${e.descricaoEvento}" th:data-sub="${prainha.nomePrainha}"></li>
+                </ul>
+                <div class="cal-topo">
+                    <button type="button" class="btn btn-ghost btn-icone" data-cal-anterior aria-label="Mês anterior"><svg class="i"><use href="#i-chevron-left"/></svg></button>
+                    <p data-cal-titulo>mês</p>
+                    <button type="button" class="btn btn-ghost btn-icone" data-cal-proximo aria-label="Próximo mês"><svg class="i"><use href="#i-chevron-right"/></svg></button>
+                </div>
+                <div class="cal-semana"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
+                <div class="cal-dias" data-cal-dias></div>
+                <div class="cal-selecao" data-cal-selecao hidden></div>
+                <div class="cal-legenda">
+                    <span><i class="l-evento"></i>Dia com evento</span>
+                    <span><i class="l-liberado"></i>Liberado para reserva</span>
+                </div>
+            </div>
+
+            <div class="proximos">
+                <h3><svg class="i i-md cor-sol"><use href="#i-party-popper"/></svg>Próximos eventos</h3>
+                <div class="vazio compacto" style="text-align:left" th:if="${eventos.isEmpty()}">
+                    <svg class="i i-lg" style="margin:0 0 12px"><use href="#i-calendar-days"/></svg>
+                    <p>Nenhum evento programado no momento. Volte em breve!</p>
+                </div>
+                <div class="lista-eventos" th:unless="${eventos.isEmpty()}">
+                    <article class="evento-item" th:each="e, it : ${eventos}" th:if="${it.index < 6}">
+                        <div class="data-bolha">
+                            <b th:text="${e.dataEvento.dayOfMonth}">10</b>
+                            <span th:text="${@visual.mesCurto(e.dataEvento)}">nov</span>
+                        </div>
+                        <div>
+                            <p class="titulo" th:text="${e.descricaoEvento}">Evento</p>
+                            <p class="sub" th:text="${@visual.dataExtenso(e.dataEvento)} + ' · ' + ${prainha.nomePrainha}">10 de novembro</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Avaliações ===== -->
+    <section class="secao">
+        <div class="secao-titulo">
+            <svg class="i i-md cor-sol"><use href="#i-star"/></svg>
+            <h2>Experiências de quem passou por aqui</h2>
+        </div>
+        <div class="grade-2" style="margin-top:24px">
+            <div>
+                <div class="vazio compacto" style="text-align:left" th:if="${avaliacoes.isEmpty()}">
+                    <svg class="i i-lg" style="margin:0 0 12px"><use href="#i-waves"/></svg>
+                    <p>Esta prainha ainda não recebeu avaliações.</p>
+                </div>
+                <article class="avaliacao-item" th:each="a : ${avaliacoes}">
+                    <p class="autor">
+                        <span th:text="${a.cliente.nomeCliente}">Cliente</span>
+                        <span class="estrelas" th:text="${#strings.repeat('★', a.notaAvaliacao)}">★★★★★</span>
+                    </p>
+                    <p class="comentario" th:if="${a.comentarioAvaliacao != null and !#strings.isEmpty(a.comentarioAvaliacao)}" th:text="${a.comentarioAvaliacao}">Comentário</p>
+                    <div class="data">
+                        <span th:text="${#temporals.format(a.dataAvaliacao, 'dd/MM/yyyy')}">01/01/2026</span>
+                        <form class="inline" th:if="${usuario != null and (usuario.administrador or usuario.id == a.cliente.idCliente)}"
+                              th:action="@{/avaliacoes/excluir/{id}(id=${a.idAvaliacao})}" method="post"
+                              data-confirmar="Excluir esta avaliação?" data-confirmar-ok="Excluir avaliação">
+                            <button class="btn btn-ghost btn-xs cor-perigo" type="submit"><svg class="i i-sm"><use href="#i-trash-2"/></svg>Excluir</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Formulário de avaliação (cliente) -->
+            <form th:if="${usuario != null and usuario.cliente}" th:action="@{/avaliacoes/salvar}" method="post" class="form-pilha">
+                <h3 class="h3">Como foi seu passeio?</h3>
+                <input type="hidden" name="prainhaId" th:value="${prainha.idPrainha}">
+                <input type="hidden" name="nota" id="nota" value="5">
+                <div class="seletor-estrelas" data-estrelas="nota" role="group" aria-label="Sua nota">
+                    <button type="button" aria-label="Nota 1"><svg class="i"><use href="#i-star"/></svg></button>
+                    <button type="button" aria-label="Nota 2"><svg class="i"><use href="#i-star"/></svg></button>
+                    <button type="button" aria-label="Nota 3"><svg class="i"><use href="#i-star"/></svg></button>
+                    <button type="button" aria-label="Nota 4"><svg class="i"><use href="#i-star"/></svg></button>
+                    <button type="button" aria-label="Nota 5"><svg class="i"><use href="#i-star"/></svg></button>
+                </div>
+                <textarea name="comentario" aria-label="Seu comentário" placeholder="Conte sua experiência" maxlength="500" rows="4"></textarea>
+                <button class="btn" type="submit">Publicar avaliação<svg class="i"><use href="#i-star"/></svg></button>
+            </form>
+            <div th:if="${usuario == null}" class="form-pilha">
+                <h3 class="h3">Como foi seu passeio?</h3>
+                <p class="ajuda">Entre na sua conta para contar sua experiência.</p>
+                <a class="btn" style="align-self:flex-start" th:href="@{/login}">Entrar para avaliar<svg class="i"><use href="#i-star"/></svg></a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

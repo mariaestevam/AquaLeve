@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "checks": [
+    "Página inicial e logo sem arquivos ausentes",
+    "Login administrativo e painel",
+    "Cadastro multipart com foto e responsável",
+    "Edição preservando foto",
+    "Calendário e evento com dados do backend",
+    "Vitrine, foto cadastrada, filtros e favoritos",
+    "Reserva pelo detalhe, montagem de data/hora e minhas reservas",
+    "Avaliação por estrelas e publicação",
+    "Modal de confirmação permite desistir sem cancelar",
+    "Layout móvel, menu e ausência de rolagem horizontal"
+  ],
+  "errors": [],
+  "httpErrors": []
+}

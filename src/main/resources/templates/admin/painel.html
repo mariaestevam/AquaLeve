@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Administração')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('admin')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container pagina-estreita">
+    <div th:replace="~{fragmentos/layout :: adminTopo('painel')}"></div>
+
+    <!-- ===== Números ===== -->
+    <div class="estatisticas">
+        <div>
+            <svg class="i"><use href="#i-waves"/></svg>
+            <p>Prainhas</p>
+            <strong th:text="${totalPrainhas}">0</strong>
+        </div>
+        <div>
+            <svg class="i"><use href="#i-calendar-plus"/></svg>
+            <p>Datas liberadas</p>
+            <strong th:text="${totalDatasLiberadas}">0</strong>
+        </div>
+        <div>
+            <svg class="i"><use href="#i-calendar-days"/></svg>
+            <p>Reservas confirmadas</p>
+            <strong th:text="${totalConfirmadas}">0</strong>
+        </div>
+        <div>
+            <svg class="i"><use href="#i-users-round"/></svg>
+            <p>Visitantes no local</p>
+            <strong th:text="${visitantesNoLocal}">0</strong>
+        </div>
+    </div>
+
+    <!-- ===== Últimas reservas ===== -->
+    <div class="secao-admin-topo">
+        <h2>Últimas reservas</h2>
+        <a class="btn btn-link" th:href="@{/reservas/listar}">Ver todas<svg class="i"><use href="#i-arrow-right"/></svg></a>
+    </div>
+    <div class="tabela-rolagem">
+        <table class="admin-table">
+            <thead><tr><th>Visitante / código</th><th>Prainha / espaço</th><th>Data</th><th>Pessoas</th><th>Status</th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${ultimasReservas}">
+                <td><strong style="font-weight:500" th:text="${r.cliente.nomeCliente}">Cliente</strong>
+                    <small th:text="${@visual.codigo(r.numeroReserva)} + ' · ' + ${r.cliente.telefoneCliente}">AQ-0001</small></td>
+                <td><span th:text="${r.prainha.nomePrainha}">Prainha</span><small th:text="${@visual.rotuloTipo(r.tipoReserva)}">Quiosque</small></td>
+                <td th:text="${#temporals.format(r.dataHora, 'dd/MM/yyyy HH:mm')}">01/01/2026 08:00</td>
+                <td th:text="${r.capacidadeReserva}">4</td>
+                <td><span class="status" th:classappend="'status-' + ${#strings.toLowerCase(r.status.name())}" th:text="${@visual.rotuloStatus(r.status)}">Confirmada</span></td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="vazio compacto" th:if="${ultimasReservas.isEmpty()}">Nenhuma reserva registrada ainda.</p>
+    </div>
+
+    <!-- ===== Atalhos ===== -->
+    <div class="secao-admin-topo"><h2>Atalhos</h2><span class="contador" th:text="${totalClientes} + ' clientes cadastrados'">0 clientes</span></div>
+    <div class="atalhos">
+        <a class="atalho" th:href="@{/admin/relatorios}"><span class="bolha"><svg class="i i-md"><use href="#i-file-down"/></svg></span><div><h3>Relatórios</h3><p>Consultar por período e baixar CSV.</p></div></a>
+        <a class="atalho" th:href="@{/admin/reservas/nova}"><span class="bolha"><svg class="i i-md"><use href="#i-calendar-check"/></svg></span><div><h3>Reservar para cliente</h3><p>Registrar e acompanhar uma reserva.</p></div></a>
+        <a class="atalho" th:href="@{/prainhas/criar}">
+            <span class="bolha"><svg class="i i-md"><use href="#i-plus"/></svg></span>
+            <div><h3>Cadastrar prainha</h3><p>Nome, cidade, descrição e serviços oferecidos.</p></div>
+        </a>
+        <a class="atalho" th:href="@{/calendarios}">
+            <span class="bolha"><svg class="i i-md"><use href="#i-calendar-plus"/></svg></span>
+            <div><h3>Liberar datas</h3><p>Os clientes só reservam nas datas liberadas.</p></div>
+        </a>
+        <a class="atalho" th:href="@{/eventos}">
+            <span class="bolha"><svg class="i i-md"><use href="#i-party-popper"/></svg></span>
+            <div><h3>Divulgar eventos</h3><p>Festas, feriados e programações nas prainhas.</p></div>
+        </a>
+        <a class="atalho" th:href="@{/reservas/listar}">
+            <span class="bolha"><svg class="i i-md"><use href="#i-clipboard-check"/></svg></span>
+            <div><h3>Entrada e saída</h3><p>Registre a chegada e a saída dos visitantes.</p></div>
+        </a>
+        <a class="atalho" th:href="@{/clientes}">
+            <span class="bolha"><svg class="i i-md"><use href="#i-users"/></svg></span>
+            <div><h3>Clientes</h3><p>Consultar e atualizar os cadastros.</p></div>
+        </a>
+        <a class="atalho" th:href="@{/administradores}">
+            <span class="bolha"><svg class="i i-md"><use href="#i-user-cog"/></svg></span>
+            <div><h3>Administradores</h3><p>Dar acesso a novos responsáveis.</p></div>
+        </a>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

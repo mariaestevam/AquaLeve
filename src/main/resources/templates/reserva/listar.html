@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Reservas')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('admin')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container pagina-estreita" data-tabela-filtrada>
+    <div th:replace="~{fragmentos/layout :: adminTopo('reservas')}"></div>
+
+    <div class="secao-admin-topo" style="margin-top:0">
+        <h2>Gerenciar reservas e controle de visitantes</h2>
+        <a class="btn" th:href="@{/admin/reservas/nova}"><svg class="i"><use href="#i-plus"/></svg>Nova reserva para cliente</a>
+        <button type="button" class="btn" data-exportar-csv data-arquivo="aqualeve-relatorio-reservas.csv" th:disabled="${reservas.isEmpty()}">
+            <svg class="i"><use href="#i-file-down"/></svg>Exportar CSV
+        </button>
+    </div>
+
+    <!-- Filtros (funcionam na própria página, sem recarregar) -->
+    <div class="barra-filtros">
+        <div class="campo-icone">
+            <svg class="i"><use href="#i-search"/></svg>
+            <input type="search" data-filtro-busca placeholder="Nome, telefone, prainha ou código" aria-label="Buscar reserva">
+        </div>
+        <select data-filtro-status aria-label="Filtrar por situação">
+            <option value="">Todas as situações</option>
+            <option value="CONFIRMADA">Confirmada</option>
+            <option value="EM_USO">No local</option>
+            <option value="FINALIZADA">Concluída</option>
+            <option value="CANCELADA">Cancelada</option>
+        </select>
+        <label>De<input type="date" data-filtro-de></label>
+        <label>Até<input type="date" data-filtro-ate></label>
+        <button type="button" class="btn btn-ghost" data-limpar-tabela>Limpar</button>
+    </div>
+
+    <div class="resumo" data-resumo>
+        <span data-resumo-total th:text="${reservas.size()} + ' reservas'">0 reservas</span>
+        <span data-resumo-pessoas>0 visitantes previstos</span>
+        <span class="forte" data-resumo-ativas>0 ativas ou concluídas</span>
+    </div>
+
+    <div class="tabela-rolagem">
+        <table class="admin-table">
+            <thead><tr><th>Visitante / código</th><th>Prainha / espaço</th><th>Data</th><th>Pessoas</th><th>Entrada</th><th>Saída</th><th>Status</th><th data-sem-csv>Ações</th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${reservas}" th:with="codigoReserva=${@visual.codigo(r.numeroReserva)}"
+                th:data-status="${r.status.name()}"
+                th:data-data="${#temporals.format(r.dataHora, 'yyyy-MM-dd')}"
+                th:data-pessoas="${r.capacidadeReserva}"
+                th:data-texto="${r.cliente.nomeCliente + ' ' + r.cliente.telefoneCliente + ' ' + r.prainha.nomePrainha + ' ' + codigoReserva + ' ' + r.numeroReserva}">
+                <td><strong style="font-weight:500" th:text="${r.cliente.nomeCliente}">Cliente</strong>
+                    <small th:text="${@visual.codigo(r.numeroReserva)} + ' · ' + ${r.cliente.telefoneCliente}">AQ-0001 · telefone</small></td>
+                <td><span th:text="${r.prainha.nomePrainha}">Prainha</span><small th:text="${@visual.rotuloTipo(r.tipoReserva)}">Quiosque</small></td>
+                <td th:text="${#temporals.format(r.dataHora, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</td>
+                <td th:text="${r.capacidadeReserva}">4</td>
+                <td th:text="${r.entradaEm != null} ? ${#temporals.format(r.entradaEm, 'HH:mm')} : '—'">—</td>
+                <td th:text="${r.saidaEm != null} ? ${#temporals.format(r.saidaEm, 'HH:mm')} : '—'">—</td>
+                <td><span class="status" th:classappend="'status-' + ${#strings.toLowerCase(r.status.name())}" th:text="${@visual.rotuloStatus(r.status)}">Confirmada</span></td>
+                <td class="acoes">
+                    <a class="btn btn-outline btn-sm" th:if="${r.status.name() == 'CONFIRMADA'}" th:href="@{/admin/reservas/editar/{id}(id=${r.numeroReserva})}">Editar</a>
+                    <form class="inline" th:if="${r.status.name() == 'CONFIRMADA'}"
+                          th:action="@{/reservas/entrada/{id}(id=${r.numeroReserva})}" method="post">
+                        <button class="btn btn-outline btn-sm" type="submit"><svg class="i"><use href="#i-door-open"/></svg>Registrar entrada</button>
+                    </form>
+                    <form class="inline" th:if="${r.status.name() == 'EM_USO'}"
+                          th:action="@{/reservas/saida/{id}(id=${r.numeroReserva})}" method="post">
+                        <button class="btn btn-outline btn-sm" type="submit"><svg class="i"><use href="#i-door-closed"/></svg>Registrar saída</button>
+                    </form>
+                    <form class="inline" th:if="${r.status.name() == 'CONFIRMADA'}"
+                          th:action="@{/reservas/cancelar/{id}(id=${r.numeroReserva})}" method="post"
+                          data-confirmar="Cancelar esta reserva?" data-confirmar-texto="O espaço ficará disponível para outros visitantes. Esta ação não pode ser desfeita."
+                          data-confirmar-ok="Confirmar cancelamento" data-confirmar-voltar="Manter reserva">
+                        <button class="btn btn-ghost btn-sm cor-perigo" type="submit">Cancelar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="vazio compacto" data-vazio-tabela th:hidden="${!reservas.isEmpty()}">Nenhuma reserva encontrada para este período.</p>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

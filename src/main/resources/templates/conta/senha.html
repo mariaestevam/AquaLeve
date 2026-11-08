@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Redefinir senha')}"></head><body>
+<header th:replace="~{fragmentos/layout :: menu('perfil')}"></header><main class="container pagina-estreita">
+<div th:replace="~{fragmentos/layout :: mensagens}"></div><div class="form-card largo">
+<h1>Redefinir senha</h1><p>Confirme sua senha atual. Após a alteração, entre novamente com a nova senha.</p>
+<form th:action="@{/clientes/senha}" th:object="${senhaForm}" method="post">
+<div class="campo"><label for="senhaAtual">Senha atual</label><input type="password" id="senhaAtual" th:field="*{senhaAtual}" autocomplete="current-password"><small class="erro-campo" th:errors="*{senhaAtual}"></small></div>
+<div class="campo"><label for="novaSenha">Nova senha</label><input type="password" id="novaSenha" th:field="*{novaSenha}" autocomplete="new-password"><small class="erro-campo" th:errors="*{novaSenha}"></small></div>
+<div class="campo"><label for="confirmarSenha">Confirmar nova senha</label><input type="password" id="confirmarSenha" th:field="*{confirmarSenha}" autocomplete="new-password"><small class="erro-campo" th:errors="*{confirmarSenha}"></small></div>
+<button class="btn" type="submit">Alterar senha</button> <a class="btn btn-outline" th:href="@{/clientes/perfil}">Voltar</a>
+</form></div></main><footer th:replace="~{fragmentos/layout :: rodape}"></footer></body></html>

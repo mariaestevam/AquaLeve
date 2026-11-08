@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Clientes')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('admin')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container pagina-estreita" data-tabela-filtrada>
+    <div th:replace="~{fragmentos/layout :: adminTopo('clientes')}"></div>
+
+    <div class="secao-admin-topo" style="margin-top:0">
+        <h2>Clientes cadastrados</h2>
+        <span class="contador" th:text="${clientes.size()} + ' clientes'">0 clientes</span>
+    </div>
+    <div class="barra-filtros" th:unless="${clientes.isEmpty()}">
+        <div class="campo-icone">
+            <svg class="i"><use href="#i-search"/></svg>
+            <input type="search" data-filtro-busca placeholder="Nome, CPF, e-mail ou telefone" aria-label="Buscar cliente">
+        </div>
+    </div>
+
+    <div class="tabela-rolagem">
+        <table class="admin-table">
+            <thead><tr><th>Nome</th><th>CPF</th><th>E-mail</th><th>Telefone</th><th>Ações</th></tr></thead>
+            <tbody>
+            <tr th:each="c : ${clientes}">
+                <td><strong style="font-weight:500" th:text="${c.nomeCliente}">Nome</strong></td>
+                <td th:text="${c.cpfCliente}">000.000.000-00</td>
+                <td th:text="${c.emailCliente}">email</td>
+                <td th:text="${c.telefoneCliente}">telefone</td>
+                <td class="acoes">
+                    <a class="btn btn-ghost btn-icone btn-sm" th:href="@{/clientes/editar/{id}(id=${c.idCliente})}" title="Editar cliente" aria-label="Editar cliente"><svg class="i"><use href="#i-pencil"/></svg></a>
+                    <form class="inline" th:action="@{/clientes/excluir/{id}(id=${c.idCliente})}" method="post"
+                          data-confirmar="Excluir este cliente?" data-confirmar-ok="Excluir cliente">
+                        <button class="btn btn-ghost btn-icone btn-sm cor-perigo" type="submit" title="Excluir cliente" aria-label="Excluir cliente"><svg class="i"><use href="#i-trash-2"/></svg></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="vazio compacto" data-vazio-tabela th:hidden="${!clientes.isEmpty()}" th:text="${clientes.isEmpty()} ? 'Nenhum cliente cadastrado.' : 'Nenhum cliente encontrado.'">Nenhum cliente encontrado.</p>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 70" width="90" height="70" role="img" aria-label="AquaLeve">
+  <!-- Ícone provisório. Ao colocar aqualeve-icone.png nesta pasta, o sistema passa a usar o PNG automaticamente. -->
+  <circle cx="45" cy="22" r="14" fill="#ffad00"/>
+  <path d="M4 44c7-7 14-7 21 0s14 7 21 0 14-7 21 0 14 7 19 2v12H4z" fill="#00b6fe"/>
+  <path d="M4 55c7-7 14-7 21 0s14 7 21 0 14-7 21 0 14 7 19 2v11H4z" fill="#004dad"/>
+</svg>

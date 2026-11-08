@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Minhas reservas')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('reservas')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container pagina">
+    <div class="titulo-pagina" style="margin-bottom:0">
+        <div>
+            <p class="sobretitulo">Seus momentos ao ar livre</p>
+            <h1>Minhas reservas</h1>
+            <p class="subtitulo">Tudo pronto para seu próximo dia mais leve.</p>
+        </div>
+        <a class="btn" th:href="@{/reservas/nova}"><svg class="i"><use href="#i-plus"/></svg>Nova reserva</a>
+    </div>
+
+    <!-- Sem reservas -->
+    <div class="vazio" th:if="${reservas.isEmpty()}">
+        <svg class="i i-2xl" style="width:40px;height:40px"><use href="#i-calendar-days"/></svg>
+        <h2>Nenhuma reserva por aqui, ainda</h2>
+        <p>Seu próximo passeio está esperando por você.</p>
+        <a class="btn" th:href="@{/prainhas}"><svg class="i"><use href="#i-search"/></svg>Explorar prainhas</a>
+    </div>
+
+    <th:block th:unless="${reservas.isEmpty()}">
+        <div class="abas" data-abas="lista-reservas" role="group" aria-label="Filtrar reservas">
+            <button type="button" class="btn" data-aba="todas" aria-pressed="true">Todas</button>
+            <button type="button" class="btn btn-outline" data-aba="ativas" aria-pressed="false">Ativas</button>
+            <button type="button" class="btn btn-outline" data-aba="historico" aria-pressed="false">Histórico</button>
+        </div>
+
+        <div class="lista-reservas" id="lista-reservas">
+            <article class="reserva-card" th:each="r : ${reservas}" th:data-status="${r.status.name()}">
+                <img th:with="foto=${@visual.foto(r.prainha)},fotoAlternativa=${@visual.fotoReserva(r.prainha)}" th:src="@{${foto}}" th:data-fallback="@{${fotoAlternativa}}" onerror="aqFallback(this)"
+                     th:alt="${r.prainha.nomePrainha}" width="1024" height="768" loading="lazy">
+                <div class="info">
+                    <span class="status" th:classappend="'status-' + ${#strings.toLowerCase(r.status.name())}" th:text="${@visual.rotuloStatus(r.status)}">Confirmada</span>
+                    <h2 th:text="${r.prainha.nomePrainha} + ' · ' + ${@visual.rotuloTipo(r.tipoReserva)}">Prainha · Quiosque</h2>
+                    <p class="local"><svg class="i i-xs"><use href="#i-map-pin"/></svg><span th:text="${r.prainha.cidadePrainha} + ', SP'">Cidade</span></p>
+                    <div class="dados">
+                        <span><svg class="i i-sm"><use href="#i-calendar-days"/></svg><span th:text="${#temporals.format(r.dataHora, 'dd/MM/yyyy HH:mm')}">01/01/2026 08:00</span></span>
+                        <span><svg class="i i-sm"><use href="#i-users-round"/></svg><span th:text="${r.capacidadeReserva} + (${r.capacidadeReserva == 1} ? ' pessoa' : ' pessoas')">4 pessoas</span></span>
+                        <span th:if="${r.entradaEm != null}"><svg class="i i-sm"><use href="#i-door-open"/></svg><span th:text="'Entrada ' + ${#temporals.format(r.entradaEm, 'HH:mm')}">Entrada</span></span>
+                        <span th:if="${r.saidaEm != null}"><svg class="i i-sm"><use href="#i-door-closed"/></svg><span th:text="'Saída ' + ${#temporals.format(r.saidaEm, 'HH:mm')}">Saída</span></span>
+                    </div>
+                    <p class="codigo" th:text="'Código: ' + ${@visual.codigo(r.numeroReserva)}">Código: AQ-0001</p>
+                </div>
+                <div class="lado">
+                    <strong>
+                        <span th:if="${r.valorReserva == 0}">Valor a definir</span>
+                        <span th:unless="${r.valorReserva == 0}" th:text="'R$ ' + ${#numbers.formatDecimal(r.valorReserva, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+                    </strong>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                        <a class="btn btn-ghost btn-sm" th:href="@{/prainhas/{id}(id=${r.prainha.idPrainha})}">Ver prainha</a>
+                        <form class="inline" th:if="${r.status.name() == 'CONFIRMADA'}"
+                              th:action="@{/reservas/cancelar/{id}(id=${r.numeroReserva})}" method="post"
+                              data-confirmar="Cancelar esta reserva?"
+                              data-confirmar-texto="O espaço ficará disponível para outros visitantes. Esta ação não pode ser desfeita."
+                              data-confirmar-ok="Confirmar cancelamento" data-confirmar-voltar="Manter reserva">
+                            <button class="btn btn-outline btn-sm" type="submit">Cancelar reserva</button>
+                        </form>
+                        <a class="btn btn-outline btn-sm" th:if="${r.status.name() == 'FINALIZADA'}"
+                           th:href="@{/avaliacoes/nova(prainhaId=${r.prainha.idPrainha})}"><svg class="i"><use href="#i-star"/></svg>Avaliar</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="vazio" data-vazio-aba hidden>
+            <svg class="i i-2xl" style="width:40px;height:40px"><use href="#i-calendar-days"/></svg>
+            <h2>Nada por aqui</h2>
+            <p>Nenhuma reserva neste filtro.</p>
+        </div>
+    </th:block>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

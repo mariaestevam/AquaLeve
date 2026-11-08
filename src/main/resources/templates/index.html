@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Encontre sua próxima prainha')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('inicio')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main>
+    <!-- ===== Hero com a foto de Mira Estrela ===== -->
+    <section class="hero">
+        <img th:src="@{/imagens/prainha-hero.jpg}" th:data-fallback="@{/imagens/prainha-hero.jpg}" onerror="aqFallback(this)"
+             alt="Paisagem ilustrativa de uma prainha" width="1920" height="1024" fetchpriority="high">
+        <div class="container hero-content">
+            <div class="hero-chamada"><span class="traco"></span><svg class="i cor-sol"><use href="#i-sun"/></svg>SEU DIA MAIS LEVE, PERTO DA NATUREZA</div>
+            <h1>Prainhas do interior.<br>Momentos que ficam.</h1>
+            <p>Descubra as prainhas do Noroeste Paulista e encontre o lugar perfeito para seu próximo passeio.</p>
+            <div class="hero-selos">
+                <span><svg class="i cor-sol"><use href="#i-waves"/></svg>Água doce, boas memórias</span>
+                <span><svg class="i cor-sol"><use href="#i-map-pin"/></svg>Interior de São Paulo</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Barra de busca (leva para a lista de prainhas filtrada por cidade) ===== -->
+    <div class="container">
+        <form class="search-bar" th:action="@{/prainhas}" method="get">
+            <div class="search-field">
+                <svg class="i"><use href="#i-map-pin"/></svg>
+                <div>
+                    <label for="destino">Onde você quer ir?</label>
+                    <input id="destino" name="cidade" placeholder="Cidade da prainha" autocomplete="off">
+                </div>
+            </div>
+            <div class="search-field">
+                <svg class="i"><use href="#i-calendar-days"/></svg>
+                <div>
+                    <label for="data-visita">Quando?</label>
+                    <input id="data-visita" name="data" type="date">
+                </div>
+            </div>
+            <div class="search-field">
+                <svg class="i"><use href="#i-users-round"/></svg>
+                <div>
+                    <label for="pessoas">Com quem?</label>
+                    <select id="pessoas" name="pessoas">
+                        <option value="">Quantidade de pessoas</option>
+                        <option value="2">2 pessoas</option>
+                        <option value="6">Até 6 pessoas</option>
+                        <option value="12">Até 12 pessoas</option>
+                        <option value="20">Até 20 pessoas</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-xl"><svg class="i"><use href="#i-search"/></svg>Buscar prainhas</button>
+        </form>
+    </div>
+
+    <!-- ===== Vitrine de prainhas ===== -->
+    <section id="prainhas" class="container" style="padding-top:56px" data-vitrine>
+        <div class="cabecalho-secao">
+            <div>
+                <div class="sobretitulo"><span class="traco"></span>Seu próximo destino</div>
+                <h2 class="titulo-secao">Um lugar para cada tipo de passeio</h2>
+                <p class="subtitulo">Sombra, água fresca e tudo o que você precisa para aproveitar.</p>
+            </div>
+            <span class="contador" data-contador th:text="${prainhas.size()} + ' prainhas para explorar'">0 prainhas para explorar</span>
+        </div>
+
+        <div class="filtros" th:unless="${prainhas.isEmpty()}">
+            <div class="pilulas">
+                <button type="button" class="btn filter-pill" data-filtro="todas" aria-pressed="true"><svg class="i"><use href="#i-waves"/></svg>Todas</button>
+                <button type="button" class="btn btn-outline filter-pill" data-filtro="quiosque"><svg class="i"><use href="#i-house"/></svg>Quiosques</button>
+                <button type="button" class="btn btn-outline filter-pill" data-filtro="chal"><svg class="i"><use href="#i-house"/></svg>Chalés</button>
+                <button type="button" class="btn btn-outline filter-pill" data-filtro="camping"><svg class="i"><use href="#i-tent"/></svg>Camping</button>
+                <button type="button" class="btn btn-outline filter-pill" data-filtro="pesca"><svg class="i"><use href="#i-fish"/></svg>Pesca</button>
+                <button type="button" class="btn btn-outline filter-pill" data-filtro="favoritas"><svg class="i"><use href="#i-heart"/></svg>Favoritas</button>
+            </div>
+            <button type="button" class="btn btn-outline filter-pill" data-alternar="filtros-extra" aria-expanded="false"><svg class="i"><use href="#i-sliders-horizontal"/></svg>Filtros</button>
+        </div>
+        <div class="filtros-extra" id="filtros-extra" hidden>
+            <label>Ordenar por
+                <select data-ordenar>
+                    <option value="nome">Nome da prainha</option>
+                    <option value="cidade">Cidade</option>
+                </select>
+            </label>
+            <button type="button" class="btn btn-ghost" data-limpar-filtros>Limpar filtros</button>
+        </div>
+
+        <div class="grade-prainhas" data-grade>
+            <th:block th:each="p : ${prainhas}">
+                <article th:replace="~{fragmentos/layout :: cartaoPrainha(${p})}"></article>
+            </th:block>
+        </div>
+
+        <div class="vazio" data-vazio th:hidden="${!prainhas.isEmpty()}">
+            <svg class="i i-xl"><use href="#i-search"/></svg>
+            <h3>Nenhuma prainha encontrada</h3>
+            <p th:text="${prainhas.isEmpty()} ? 'Ainda não há prainhas cadastradas. Volte em breve!' : 'Tente outra cidade ou remova os filtros.'">Tente outra cidade ou remova os filtros.</p>
+            <button type="button" class="btn btn-link" data-limpar-filtros th:unless="${prainhas.isEmpty()}">Ver todas as prainhas</button>
+        </div>
+
+        <div style="margin-top:28px;text-align:center" th:unless="${prainhas.isEmpty()}">
+            <a class="btn btn-outline" th:href="@{/prainhas}">Ver todas as prainhas<svg class="i"><use href="#i-arrow-right"/></svg></a>
+        </div>
+        <p class="nota-rodape">Fotos reais das prainhas quando disponíveis; as demais são ilustrativas.</p>
+    </section>
+
+    <!-- ===== Benefícios ===== -->
+    <section class="faixa-beneficios">
+        <div class="container">
+            <div class="beneficio">
+                <div class="bolha"><svg class="i i-md"><use href="#i-leaf"/></svg></div>
+                <div><h3>Natureza por perto</h3><p>Uma pausa na rotina, sem ir tão longe.</p></div>
+            </div>
+            <div class="beneficio">
+                <div class="bolha"><svg class="i i-md"><use href="#i-calendar-days"/></svg></div>
+                <div><h3>Seu passeio, organizado</h3><p>Escolha seu espaço e consulte a disponibilidade.</p></div>
+            </div>
+            <div class="beneficio">
+                <div class="bolha"><svg class="i i-md"><use href="#i-shield-check"/></svg></div>
+                <div><h3>Mais tranquilidade</h3><p>Suas reservas reunidas em um só lugar.</p></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

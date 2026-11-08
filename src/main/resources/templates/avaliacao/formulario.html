@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Avaliar prainha')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('reservas')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container centro-vertical">
+    <div class="form-card largo">
+        <div class="topo-form">
+            <svg class="i i-xl cor-sol" style="margin:0 auto 12px"><use href="#i-star"/></svg>
+            <h1>Como foi seu passeio?</h1>
+            <p>Conte para outros visitantes como foi sua experiência em <strong th:text="${prainha.nomePrainha}">Prainha</strong>.</p>
+        </div>
+
+        <div class="msg erro" th:if="${erro}"><svg class="i"><use href="#i-circle-alert"/></svg><span th:text="${erro}">Erro</span></div>
+
+        <form th:action="@{/avaliacoes/salvar}" th:object="${avaliacaoForm}" method="post" novalidate>
+            <input type="hidden" th:field="*{prainhaId}">
+            <input type="hidden" id="nota" name="nota" th:value="*{nota} != null ? *{nota} : 5">
+            <div class="campo" th:classappend="${#fields.hasErrors('nota')} ? 'com-erro'">
+                <span style="font-size:13px;font-weight:500">Sua nota</span>
+                <div class="seletor-estrelas" data-estrelas="nota" role="group" aria-label="Sua nota">
+                    <button type="button" aria-label="Nota 1 — Ruim"><svg class="i"><use href="#i-star"/></svg></button>
+                    <button type="button" aria-label="Nota 2 — Regular"><svg class="i"><use href="#i-star"/></svg></button>
+                    <button type="button" aria-label="Nota 3 — Bom"><svg class="i"><use href="#i-star"/></svg></button>
+                    <button type="button" aria-label="Nota 4 — Muito bom"><svg class="i"><use href="#i-star"/></svg></button>
+                    <button type="button" aria-label="Nota 5 — Excelente"><svg class="i"><use href="#i-star"/></svg></button>
+                </div>
+                <small class="erro-campo" th:if="${#fields.hasErrors('nota')}" th:errors="*{nota}"></small>
+            </div>
+            <div class="campo" th:classappend="${#fields.hasErrors('comentario')} ? 'com-erro'">
+                <label for="comentario">Comentário (opcional)</label>
+                <textarea id="comentario" rows="4" maxlength="500" th:field="*{comentario}" placeholder="Conte sua experiência"></textarea>
+                <small class="erro-campo" th:if="${#fields.hasErrors('comentario')}" th:errors="*{comentario}"></small>
+            </div>
+            <div class="acoes-form">
+                <a class="btn btn-outline btn-lg" th:href="@{/prainhas/{id}(id=${prainha.idPrainha})}">Cancelar</a>
+                <button class="btn btn-lg" type="submit">Publicar avaliação<svg class="i"><use href="#i-star"/></svg></button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

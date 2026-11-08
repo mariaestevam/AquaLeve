@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<!-- =====================================================================
+     Fragmentos usados por todas as telas do AquaLeve
+     ===================================================================== -->
+
+<!-- ===== HEAD: <head th:replace="~{fragmentos/layout :: cabecalho('Título')}"></head> ===== -->
+<head th:fragment="cabecalho(titulo)">
+    <meta charset="UTF-8">
+    <!-- Materializa o CSRF antes de a resposta extensa (sprite SVG) ser enviada. -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' — AquaLeve'">AquaLeve</title>
+    <meta name="description" content="Explore as prainhas de água doce do Noroeste Paulista e planeje seu próximo passeio com o AquaLeve.">
+    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Oswald:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/aqualeve.css}">
+    <!-- Se uma imagem não existir, troca pela alternativa indicada em data-fallback -->
+    <script>function aqFallback(img){img.onerror=null;if(img.dataset.fallback){img.src=img.dataset.fallback;}}</script>
+</head>
+
+<body>
+
+<!-- ===== MENU: <header th:replace="~{fragmentos/layout :: menu('prainhas')}"></header> =====
+     Valores de "ativo": inicio, prainhas, eventos, reservas, sobre, perfil, admin -->
+<header class="site-header" th:fragment="menu(ativo)">
+    <div th:replace="~{fragmentos/icones :: sprite}"></div>
+
+    <div class="container barra">
+        <a class="brand" th:href="@{/}" aria-label="AquaLeve — início">
+            <img th:src="@{/imagens/aqualeve-logo.svg}" th:data-fallback="@{/imagens/aqualeve-logo.svg}" onerror="aqFallback(this)"
+                 width="1516" height="477" alt="AquaLeve — Gerenciamento de Prainhas">
+        </a>
+
+        <nav class="nav-principal" aria-label="Navegação principal">
+            <a th:href="@{/prainhas}" class="nav-link" th:classappend="${ativo == 'inicio' or ativo == 'prainhas'} ? 'active'">Explorar prainhas</a>
+            <a th:href="@{/eventos}" class="nav-link" th:classappend="${ativo == 'eventos'} ? 'active'">Eventos</a>
+            <th:block th:if="${usuario == null or usuario.cliente}">
+                <a th:href="@{/reservas/minhas}" class="nav-link" th:classappend="${ativo == 'reservas'} ? 'active'">Minhas reservas</a>
+            </th:block>
+            <th:block th:if="${usuario != null and usuario.administrador}">
+                <a th:href="@{/admin}" class="nav-link" th:classappend="${ativo == 'admin'} ? 'active'">Administração</a>
+            </th:block>
+            <a th:href="@{/sobre}" class="nav-link" th:classappend="${ativo == 'sobre'} ? 'active'">Sobre o AquaLeve</a>
+        </nav>
+
+        <div class="header-acoes">
+            <!-- Visitante -->
+            <a th:if="${usuario == null}" th:href="@{/login}" class="btn btn-outline primaria">
+                <svg class="i"><use href="#i-user-round"/></svg>Entrar <span class="so-desktop">ou cadastrar</span>
+            </a>
+            <!-- Logado -->
+            <th:block th:if="${usuario != null}">
+                <a class="btn btn-ghost primaria so-desktop-flex"
+                   th:href="${usuario.administrador} ? @{/admin} : @{/clientes/perfil}"
+                   th:title="${usuario.administrador} ? 'Painel do administrador' : 'Meu perfil'">
+                    <svg class="i"><use th:href="${usuario.administrador} ? '#i-shield-check' : '#i-user-round'"/></svg>
+                    <span th:text="${usuario.primeiroNome}">Minha conta</span>
+                </a>
+                <!-- Sair é POST (o th:action já envia o token CSRF) -->
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-ghost btn-icone" title="Sair da conta" aria-label="Sair da conta">
+                        <svg class="i"><use href="#i-log-out"/></svg>
+                    </button>
+                </form>
+            </th:block>
+            <button type="button" class="btn btn-ghost btn-icone menu-toggle" data-menu-toggle aria-label="Abrir menu" aria-expanded="false">
+                <svg class="i i-md"><use href="#i-menu"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Menu do celular -->
+    <nav class="nav-mobile" aria-label="Navegação principal (celular)">
+        <a th:href="@{/prainhas}" class="nav-link" th:classappend="${ativo == 'inicio' or ativo == 'prainhas'} ? 'active'">Explorar prainhas</a>
+        <a th:href="@{/eventos}" class="nav-link" th:classappend="${ativo == 'eventos'} ? 'active'">Eventos</a>
+        <a th:if="${usuario == null or usuario.cliente}" th:href="@{/reservas/minhas}" class="nav-link" th:classappend="${ativo == 'reservas'} ? 'active'">Minhas reservas</a>
+        <a th:if="${usuario != null and usuario.cliente}" th:href="@{/clientes/perfil}" class="nav-link" th:classappend="${ativo == 'perfil'} ? 'active'">Meu perfil</a>
+        <a th:if="${usuario != null and usuario.administrador}" th:href="@{/admin}" class="nav-link" th:classappend="${ativo == 'admin'} ? 'active'">Administração</a>
+        <a th:href="@{/sobre}" class="nav-link" th:classappend="${ativo == 'sobre'} ? 'active'">Sobre o AquaLeve</a>
+        <form th:if="${usuario != null}" th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-ghost"><svg class="i"><use href="#i-log-out"/></svg>Sair</button>
+        </form>
+    </nav>
+</header>
+
+<!-- ===== MENSAGENS (sucesso/erro): <div th:replace="~{fragmentos/layout :: mensagens}"></div> =====
+     Aparecem como avisos flutuantes no canto da tela e somem sozinhos. -->
+<div class="toasts" th:fragment="mensagens" aria-live="polite">
+    <div class="toast sucesso" role="status" th:if="${sucesso}">
+        <svg class="i"><use href="#i-circle-check"/></svg>
+        <span th:text="${sucesso}">Tudo certo.</span>
+        <button type="button" class="fechar" aria-label="Fechar mensagem"><svg class="i i-sm"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="toast erro" role="alert" th:if="${erro}">
+        <svg class="i"><use href="#i-circle-alert"/></svg>
+        <span th:text="${erro}">Algo deu errado.</span>
+        <button type="button" class="fechar" aria-label="Fechar mensagem"><svg class="i i-sm"><use href="#i-x"/></svg></button>
+    </div>
+</div>
+
+<!-- ===== CARTÃO DE PRAINHA: <article th:replace="~{fragmentos/layout :: cartaoPrainha(${p})}"></article> ===== -->
+<article class="beach-card" th:fragment="cartaoPrainha(p)"
+         th:with="linkDetalhe=@{/prainhas/{id}(id=${p.idPrainha},data=${param.data != null and !#strings.isEmpty(param.data[0]) ? param.data[0] : null},pessoas=${param.pessoas != null and !#strings.isEmpty(param.pessoas[0]) ? param.pessoas[0] : null})}"
+         th:data-id="${p.idPrainha}" th:data-nome="${p.nomePrainha}" th:data-cidade="${p.cidadePrainha}"
+         th:data-servicos="${#strings.toLowerCase(p.servicosPrainha)}">
+    <div class="beach-image">
+        <a th:href="${linkDetalhe}" tabindex="-1">
+            <img th:with="foto=${@visual.foto(p)},fotoAlternativa=${@visual.fotoReserva(p)}" th:src="@{${foto}}" th:data-fallback="@{${fotoAlternativa}}" onerror="aqFallback(this)"
+                 th:alt="${p.nomePrainha}" width="1024" height="768" loading="lazy">
+        </a>
+        <span class="selo-foto" th:text="${@visual.fotoReal(p)} ? 'Foto cadastrada' : 'Conheça este destino'">Conheça este destino</span>
+        <button type="button" class="btn-favorito" th:data-id="${p.idPrainha}" th:data-nome="${p.nomePrainha}" aria-pressed="false" aria-label="Favoritar">
+            <svg class="i"><use href="#i-heart"/></svg>
+        </button>
+    </div>
+    <div class="beach-body">
+        <div class="beach-local">
+            <svg class="i i-sm cor-agua"><use href="#i-map-pin"/></svg>
+            <span th:text="${p.cidadePrainha} + ', SP'">Cidade, SP</span>
+        </div>
+        <a th:href="${linkDetalhe}"><h3 th:text="${p.nomePrainha}">Prainha</h3></a>
+        <p class="beach-desc" th:text="${p.descricaoPrainha}">Descrição</p>
+        <div class="servicos">
+            <span class="service-icon" th:each="sv : ${@visual.servicos(p)}">
+                <svg class="i"><use th:with="nomeIcone=${@visual.iconeServico(sv)}" th:href="'#i-' + ${nomeIcone}"/></svg><span th:text="${sv}">Serviço</span>
+            </span>
+        </div>
+        <div class="beach-footer">
+            <div class="beach-footer-inner">
+                <div>
+                    <small>Espaços para reservar</small>
+                    <strong>Quiosque, chalé ou camping</strong>
+                </div>
+                <a class="btn btn-ghost primaria btn-sm" th:href="${linkDetalhe}">
+                    Conhecer<svg class="i"><use href="#i-arrow-right"/></svg>
+                </a>
+            </div>
+            <!-- Ações do administrador -->
+            <div class="acoes-admin-cartao" th:if="${usuario != null and usuario.administrador}">
+                <a class="btn btn-outline btn-xs" th:href="@{/prainhas/editar/{id}(id=${p.idPrainha})}"><svg class="i"><use href="#i-pencil"/></svg>Editar</a>
+                <form class="inline" th:action="@{/prainhas/excluir/{id}(id=${p.idPrainha})}" method="post"
+                      data-confirmar="Excluir esta prainha?" data-confirmar-texto="A prainha deixará de aparecer para os visitantes. Esta ação não pode ser desfeita." data-confirmar-ok="Excluir prainha">
+                    <button class="btn btn-perigo-outline btn-xs" type="submit"><svg class="i"><use href="#i-trash-2"/></svg>Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- ===== TOPO DA ADMINISTRAÇÃO: <div th:replace="~{fragmentos/layout :: adminTopo('painel')}"></div> =====
+     Valores de "aba": painel, prainhas, calendario, eventos, reservas, clientes, administradores -->
+<div th:fragment="adminTopo(aba)">
+    <div class="admin-topo">
+        <div>
+            <p class="sobretitulo">Gestão de prainhas</p>
+            <h1>Administração AquaLeve</h1>
+        </div>
+        <span class="status"><svg class="i i-xs"><use href="#i-shield-check"/></svg>Administrador</span>
+    </div>
+    <nav class="admin-nav" aria-label="Seções de administração">
+        <a class="btn" th:classappend="${aba == 'painel'} ? 'ativo'" th:href="@{/admin}"><svg class="i"><use href="#i-layout-dashboard"/></svg>Visão geral</a>
+        <a class="btn" th:classappend="${aba == 'prainhas'} ? 'ativo'" th:href="@{/prainhas}"><svg class="i"><use href="#i-waves"/></svg>Prainhas</a>
+        <a class="btn" th:classappend="${aba == 'calendario'} ? 'ativo'" th:href="@{/calendarios}"><svg class="i"><use href="#i-calendar-plus"/></svg>Calendário</a>
+        <a class="btn" th:classappend="${aba == 'eventos'} ? 'ativo'" th:href="@{/eventos}"><svg class="i"><use href="#i-party-popper"/></svg>Eventos</a>
+        <a class="btn" th:classappend="${aba == 'reservas'} ? 'ativo'" th:href="@{/reservas/listar}"><svg class="i"><use href="#i-clipboard-check"/></svg>Reservas, entrada e saída</a>
+        <a class="btn" th:classappend="${aba == 'relatorios'} ? 'ativo'" th:href="@{/admin/relatorios}"><svg class="i"><use href="#i-file-down"/></svg>Relatórios</a>
+        <a class="btn" th:classappend="${aba == 'clientes'} ? 'ativo'" th:href="@{/clientes}"><svg class="i"><use href="#i-users"/></svg>Clientes</a>
+        <a class="btn" th:classappend="${aba == 'administradores'} ? 'ativo'" th:href="@{/administradores}"><svg class="i"><use href="#i-user-cog"/></svg>Administradores</a>
+    </nav>
+</div>
+
+<!-- ===== RODAPÉ: <footer th:replace="~{fragmentos/layout :: rodape}"></footer> ===== -->
+<footer class="site-footer" th:fragment="rodape">
+    <div class="container colunas">
+        <div>
+            <a th:href="@{/}" class="footer-brand" aria-label="AquaLeve — início">
+                <img th:src="@{/imagens/aqualeve-logo.svg}" th:data-fallback="@{/imagens/aqualeve-logo.svg}" onerror="aqFallback(this)"
+                     width="1516" height="477" alt="AquaLeve — Gerenciamento de Prainhas" loading="lazy">
+            </a>
+            <p class="slogan">Mais perto da natureza.<br>Mais leve para planejar.</p>
+        </div>
+        <div>
+            <h3>Seu próximo passeio</h3>
+            <div class="links">
+                <a th:href="@{/prainhas}">Explorar prainhas</a>
+                <a th:href="@{/eventos}">Eventos</a>
+                <a th:href="@{/reservas/minhas}">Minhas reservas</a>
+                <a th:href="@{/sobre}">Sobre o AquaLeve</a>
+            </div>
+        </div>
+        <div>
+            <h3>Para administradores</h3>
+            <div class="links">
+                <a th:href="@{/admin}">Área de gestão <svg class="i"><use href="#i-arrow-up-right"/></svg></a>
+            </div>
+            <p class="pequeno">Prainhas do Noroeste Paulista<br>Turismo, natureza e bons momentos.</p>
+        </div>
+    </div>
+    <div class="container barra-final">
+        <span>© <span th:text="${#dates.year(#dates.createNow())}">2026</span> AquaLeve · Gerenciamento de Prainhas · TCC ETEC Prof. Armando José Farinazzo</span>
+        <span>Feito para tornar seus dias mais leves.</span>
+    </div>
+
+    <!-- Janela de confirmação (usada por formulários com data-confirmar) -->
+    <dialog class="dialogo" id="dialogo-confirmar" aria-labelledby="dialogo-titulo">
+        <h2 id="dialogo-titulo">Confirmar?</h2>
+        <p>Esta ação não pode ser desfeita.</p>
+        <div class="rodape-dialogo">
+            <button type="button" class="btn btn-outline" data-voltar>Voltar</button>
+            <button type="button" class="btn" data-ok>Confirmar</button>
+        </div>
+    </dialog>
+    <script th:src="@{/js/aqualeve.js}" defer></script>
+</footer>
+
+</body>
+</html>

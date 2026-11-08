@@ -1,0 +1,18 @@
+AQUALEVE — JAVA / SPRING BOOT
+
+Não precisa instalar ou executar Python, Node.js ou npm.
+
+1. Instale JDK 17+, Apache Maven 3.9+ e PostgreSQL 14+.
+   Confira java -version, javac -version e mvn -version.
+2. Crie o banco bdaqualeve, caso ainda não exista.
+3. Copie config/application.properties.example para config/application.properties.
+4. Preencha senha do banco, chave JWT (32+ caracteres) e e-mail/senha do administrador.
+5. Abra o terminal na pasta AquaLeve (a que contém pom.xml).
+6. No Windows: mvn clean verify
+               mvn spring-boot:run
+   No Linux/macOS: mvn clean verify
+                  mvn spring-boot:run
+7. Acesse http://localhost:8080.
+
+O README.md explica cada configuração. Não apague o banco antigo.
+A senha de um administrador já existente não muda ao reiniciar.

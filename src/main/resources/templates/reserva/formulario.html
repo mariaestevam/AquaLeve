@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Nova reserva')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('reservas')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container pagina-estreita">
+    <a class="voltar" th:href="@{/reservas/minhas}"><svg class="i"><use href="#i-arrow-left"/></svg>Minhas reservas</a>
+
+    <div class="form-card largo" style="margin-top:8px">
+        <div class="painel-titulo">
+            <svg class="i i-lg cor-agua"><use href="#i-calendar-days"/></svg>
+            <h1 class="h2" style="font-size:28px">Reserve seu espaço</h1>
+        </div>
+        <p class="ajuda" style="margin:-8px 0 20px">Só é possível reservar em datas liberadas no calendário da prainha e em espaços ainda livres. Dica: na página de cada prainha você vê as datas liberadas.</p>
+
+        <div class="msg erro" th:if="${erro}"><svg class="i"><use href="#i-circle-alert"/></svg><span th:text="${erro}">Erro</span></div>
+
+        <form th:action="@{/reservas/salvar}" th:object="${reservaForm}" method="post" novalidate>
+            <div class="campo" th:classappend="${#fields.hasErrors('prainhaId')} ? 'com-erro'">
+                <label for="prainhaId">Prainha</label>
+                <select id="prainhaId" th:field="*{prainhaId}">
+                    <option value="">Selecione a prainha</option>
+                    <option th:each="p : ${prainhas}" th:value="${p.idPrainha}"
+                            th:text="${p.nomePrainha + ' — ' + p.cidadePrainha}">Prainha</option>
+                </select>
+                <small class="erro-campo" th:if="${#fields.hasErrors('prainhaId')}" th:errors="*{prainhaId}"></small>
+            </div>
+            <div class="linha-form">
+                <div class="campo" th:classappend="${#fields.hasErrors('tipoReserva')} ? 'com-erro'">
+                    <label for="tipoReserva">Espaço</label>
+                    <select id="tipoReserva" th:field="*{tipoReserva}">
+                        <option value="">Selecione um espaço</option>
+                        <option th:each="t : ${tipos}" th:value="${t}" th:text="${@visual.rotuloTipo(t)}">Quiosque</option>
+                    </select>
+                    <small class="erro-campo" th:if="${#fields.hasErrors('tipoReserva')}" th:errors="*{tipoReserva}"></small>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('capacidadeReserva')} ? 'com-erro'">
+                    <label for="capacidadeReserva">Pessoas</label>
+                    <input type="number" id="capacidadeReserva" min="1" th:field="*{capacidadeReserva}" placeholder="1">
+                    <small class="erro-campo" th:if="${#fields.hasErrors('capacidadeReserva')}" th:errors="*{capacidadeReserva}"></small>
+                </div>
+            </div>
+            <div class="campo" style="margin-top:16px" th:classappend="${#fields.hasErrors('dataHora')} ? 'com-erro'">
+                <label for="dataHora">Data e horário de chegada</label>
+                <input type="datetime-local" id="dataHora" th:field="*{dataHora}">
+                <small class="erro-campo" th:if="${#fields.hasErrors('dataHora')}" th:errors="*{dataHora}"></small>
+            </div>
+            <div class="acoes-form">
+                <a class="btn btn-outline btn-lg" th:href="@{/prainhas}">Cancelar</a>
+                <button class="btn btn-lg" type="submit"><svg class="i"><use href="#i-calendar-check"/></svg>Confirmar reserva</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

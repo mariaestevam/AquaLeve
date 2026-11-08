@@ -1,0 +1,79 @@
+@startuml
+title AquaLeve — operações de aplicação
+hide circle
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+left to right direction
+actor Administrador as UsuarioAdministrador
+actor Cliente as UsuarioCliente
+class AuthService {
+  +login(dados: LoginForm): TokenResponse
+}
+class ClienteService {
+  +cadastrar(form: CadastroClienteForm): Cliente
+  +atualizarConta(id: Integer, form: ContaForm): Cliente
+  +redefinirSenha(id: Integer, form: RedefinirSenhaForm): void
+  +findAll(): List<Cliente>
+  +deleteById(id: Integer): void
+}
+class AdministradorService {
+  +cadastrar(form: CadastroAdministradorForm): Administrador
+  +atualizarConta(id: Integer, form: ContaForm): Administrador
+  +excluir(id: Integer, idLogado: Long): void
+}
+class PrainhaService {
+  +save(form: PrainhaForm): Prainha
+  +findByCidade(cidade: String): List<Prainha>
+  +findById(id: Integer): Prainha
+  +deleteById(id: Integer): void
+}
+class ReservaService {
+  +reservar(form: ReservaForm, idCliente: Long): Reserva
+  +cadastrarReserva(form: ReservaAdministradorForm): Reserva
+  +editarReserva(numero: Integer, form: ReservaAdministradorForm): Reserva
+  +consultarDisponibilidade(idPrainha: Integer, data: LocalDate): DisponibilidadeResponse
+  +registrarEntrada(numero: Integer): Reserva
+  +registrarSaida(numero: Integer): Reserva
+  +cancelar(numero: Integer, usuario: UsuarioLogado): Reserva
+  +findByCliente(idCliente: Integer): List<Reserva>
+  +findAll(): List<Reserva>
+}
+class CalendarioService {
+  +liberar(form: CalendarioForm): Calendario
+  +datasFuturas(idPrainha: Integer): List<Calendario>
+  +deleteById(id: Integer): void
+}
+class EventosService {
+  +cadastrar(form: EventoForm): Eventos
+  +proximosDaPrainha(idPrainha: Integer): List<Eventos>
+  +deleteById(id: Integer): void
+}
+class AvaliacaoService {
+  +avaliar(form: AvaliacaoForm, idCliente: Long): Avaliacao
+  +mediaDaPrainha(idPrainha: Integer): Double
+  +excluir(id: Integer, usuario: UsuarioLogado): Integer
+}
+class RelatorioController {
+  +relatorio(inicio: LocalDate, fim: LocalDate, model: Model): String
+  +csv(inicio: LocalDate, fim: LocalDate): ResponseEntity<byte[]>
+}
+UsuarioAdministrador ..> AuthService : logar
+UsuarioCliente ..> AuthService : logar
+UsuarioAdministrador ..> ClienteService : editar/excluir cliente
+UsuarioAdministrador ..> AdministradorService
+UsuarioAdministrador ..> PrainhaService
+UsuarioAdministrador ..> ReservaService : verificar/cadastrar/editar/entrada/saída
+UsuarioAdministrador ..> CalendarioService
+UsuarioAdministrador ..> EventosService
+UsuarioAdministrador ..> RelatorioController : gerar relatório
+UsuarioCliente ..> ClienteService : cadastrar/redefinir senha
+UsuarioCliente ..> PrainhaService : consultar
+UsuarioCliente ..> ReservaService : realizar/consultar/cancelar
+UsuarioCliente ..> AvaliacaoService : avaliar
+UsuarioCliente ..> CalendarioService : visualizar
+note bottom
+Visão de operações relevantes aos casos de uso.
+Controllers validam entrada e autorização; serviços aplicam as regras;
+entidades persistem os dados. Não há métodos vazios para imitar o desenho.
+end note
+@enduml

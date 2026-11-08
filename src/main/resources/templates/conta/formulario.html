@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho(${titulo})}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu(${usuario != null and usuario.administrador} ? 'admin' : 'perfil')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container centro-vertical">
+    <div class="form-card largo">
+        <div class="topo-form">
+            <svg class="i i-xl cor-agua" style="margin:0 auto 12px"><use href="#i-user-round"/></svg>
+            <h1 th:text="${titulo}">Minha conta</h1>
+            <p th:if="${acao == '/clientes/perfil'}"><a class="btn btn-outline" th:href="@{/clientes/senha}">Redefinir minha senha</a></p>
+            <p>Mantenha os dados de contato atualizados para receber avisos das reservas.</p>
+        </div>
+
+        <form th:action="@{${acao}}" th:object="${contaForm}" method="post" novalidate>
+            <div class="campo">
+                <label for="email-exibido">E-mail (não pode ser alterado)</label>
+                <input type="text" id="email-exibido" th:value="${emailExibido}" readonly>
+            </div>
+            <div class="campo" th:classappend="${#fields.hasErrors('nome')} ? 'com-erro'">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" th:field="*{nome}" autocomplete="name">
+                <small class="erro-campo" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+            </div>
+            <div class="campo" th:classappend="${#fields.hasErrors('telefone')} ? 'com-erro'">
+                <label for="telefone">Telefone</label>
+                <input type="text" id="telefone" th:field="*{telefone}" inputmode="tel" autocomplete="tel">
+                <small class="erro-campo" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></small>
+            </div>
+            <div class="acoes-form">
+                <a class="btn btn-outline btn-lg" th:href="@{${voltar}}">Voltar</a>
+                <button class="btn btn-lg" type="submit"><svg class="i"><use href="#i-check"/></svg>Salvar</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

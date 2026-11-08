@@ -1,0 +1,99 @@
+@startuml
+title AquaLeve — modelo persistido revisado
+hide circle
+skinparam classAttributeIconSize 0
+skinparam classBackgroundColor #FFFFE7
+skinparam classBorderColor #34495E
+skinparam linetype ortho
+skinparam shadowing false
+class Administrador {
+  -idAdministrador: Integer
+  -nomeAdministrador: String
+  -telefoneAdministrador: String
+  -emailAdministrador: String
+  -senhaAdministrador: String
+}
+class Avaliacao {
+  -idAvaliacao: Integer
+  -notaAvaliacao: Integer
+  -comentarioAvaliacao: String
+  -dataAvaliacao: LocalDate
+  -cliente: Cliente
+  -prainha: Prainha
+}
+class Calendario {
+  -idCalendario: Integer
+  -dataDisponivel: LocalDate
+  -prainha: Prainha
+}
+class Cliente {
+  -idCliente: Integer
+  -versaoSenha: Long
+  -cpfCliente: String
+  -nomeCliente: String
+  -emailCliente: String
+  -telefoneCliente: String
+  -senhaCliente: String
+}
+class Eventos {
+  -idEvento: Integer
+  -dataEvento: LocalDate
+  -descricaoEvento: String
+  -calendario: Calendario
+}
+class Prainha {
+  -idPrainha: Integer
+  -nomePrainha: String
+  -descricaoPrainha: String
+  -cidadePrainha: String
+  -servicosPrainha: String
+  -administrador: Administrador
+  -imagem: byte[]
+  -imagemTipo: String
+  +isTemImagem(): boolean
+}
+class Reserva {
+  -numeroReserva: Integer
+  -capacidadeReserva: Integer
+  -valorReserva: double
+  -tipoReserva: String
+  -disponibilidadeReserva: String
+  -dataHora: LocalDateTime
+  -status: StatusReserva
+  -entradaEm: LocalDateTime
+  -saidaEm: LocalDateTime
+  -cliente: Cliente
+  -prainha: Prainha
+}
+enum StatusReserva {
+  CONFIRMADA
+  EM_USO
+  FINALIZADA
+  CANCELADA
+}
+Administrador "0..1" -- "0..*" Prainha : responsável
+Prainha "1" -- "0..*" Calendario : datas liberadas
+Calendario "1" -- "0..*" Eventos : eventos
+Prainha "1" -- "0..*" Reserva : reservas
+Cliente "1" -- "0..*" Reserva : titular
+Cliente "1" -- "0..*" Avaliacao : autor
+Prainha "1" -- "0..*" Avaliacao : avaliações
+Reserva ..> StatusReserva : status
+note bottom of Cliente
+CPF é texto; idCliente é a chave técnica.
+versaoSenha permite revogar sessões.
+end note
+note bottom of Prainha
+Responsável opcional para registros legados.
+Novos cadastros recebem um responsável.
+Gestão compartilhada entre administradores.
+end note
+note bottom of Calendario
+Um registro = uma data liberada.
+Único por (prainha, dataDisponivel).
+end note
+legend bottom
+Getters/setters gerados pelo Lombok omitidos.
+Associações mostram a cardinalidade do banco; não implicam coleções Java inversas.
+endlegend
+@enduml

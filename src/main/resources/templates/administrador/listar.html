@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Administradores')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('admin')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container pagina-estreita">
+    <div th:replace="~{fragmentos/layout :: adminTopo('administradores')}"></div>
+
+    <div class="secao-admin-topo" style="margin-top:0">
+        <h2>Administradores</h2>
+        <a class="btn" th:href="@{/administradores/novo}"><svg class="i"><use href="#i-plus"/></svg>Novo administrador</a>
+    </div>
+    <div class="tabela-rolagem">
+        <table class="admin-table">
+            <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Ações</th></tr></thead>
+            <tbody>
+            <tr th:each="a : ${administradores}">
+                <td>
+                    <strong style="font-weight:500" th:text="${a.nomeAdministrador}">Nome</strong>
+                    <small th:if="${usuario.id == a.idAdministrador}">Você</small>
+                </td>
+                <td th:text="${a.emailAdministrador}">email</td>
+                <td th:text="${a.telefoneAdministrador}">telefone</td>
+                <td class="acoes">
+                    <a class="btn btn-ghost btn-icone btn-sm" th:href="@{/administradores/editar/{id}(id=${a.idAdministrador})}" title="Editar administrador" aria-label="Editar administrador"><svg class="i"><use href="#i-pencil"/></svg></a>
+                    <form class="inline" th:if="${usuario.id != a.idAdministrador}"
+                          th:action="@{/administradores/excluir/{id}(id=${a.idAdministrador})}" method="post"
+                          data-confirmar="Excluir este administrador?" data-confirmar-texto="A pessoa perderá o acesso à área de gestão." data-confirmar-ok="Excluir administrador">
+                        <button class="btn btn-ghost btn-icone btn-sm cor-perigo" type="submit" title="Excluir administrador" aria-label="Excluir administrador"><svg class="i"><use href="#i-trash-2"/></svg></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

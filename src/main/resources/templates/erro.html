@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho(${titulo})}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('erro')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container">
+    <div class="erro-pagina">
+        <svg class="i i-2xl cor-agua" style="margin:0 auto 16px"><use href="#i-waves"/></svg>
+        <div class="codigo" th:text="${codigo}">404</div>
+        <h1 th:text="${titulo}">Algo deu errado</h1>
+        <p th:text="${mensagem}">Mensagem</p>
+        <a class="btn" th:href="@{/}"><svg class="i"><use href="#i-arrow-left"/></svg>Voltar ao início</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

@@ -1,0 +1,8 @@
+public pages 3342 2443 2069
+admin login OK
+multipart save, public detail and stored image OK 1
+calendar, event, admin pages and CSV OK
+client signup/login/reservation/review/cancel OK
+HTTP SMOKE PASS
+RESTART PERSISTENCE PASS: prainha e foto de 1081227 bytes recuperadas; SHA-256 idêntico.
+Edição mantém a foto. Upload acima de 5 MB retorna HTTP 413 e preserva os dados.

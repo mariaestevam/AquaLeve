@@ -1,0 +1,187 @@
+{
+  "data": "2026-11-07",
+  "total": 35,
+  "falhas": 0,
+  "erros": 0,
+  "bancos_validados": [
+    "H2 2.4.240 em modo PostgreSQL",
+    "PostgreSQL 17.6; schema isolado interface_v6_tests"
+  ],
+  "testes": [
+    {
+      "classe": "br.com.tcc.aqualeve.AqualeveApplicationTests",
+      "teste": "contextLoads",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "tiposDatasDisponibilidadeEConflitos",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "interfacePublicaMostraFotoCadastradaEEncaminhaEscolhas",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "paginasAdministrativasRenderizam",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "edicaoRecusaConflitoEPreservaReservaOriginal",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "clientePerfilEdicaoAdministrativaEExclusao",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "jpegAceitoGifRecusadoEImagemDesconhecida404",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "relatoriosFiltrosDatasECsv",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "matrizDePerfisEmTodasAsOperacoesAdministrativas",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "prainhaTemResponsavelEditavelESuaExclusaoEProtegida",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "clienteVinculadoNaoPodeSerExcluido",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "loginRealPorSenhaDefinePerfilECookie",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "administradorExcluidoNaoMantemAcessoComCookieAntigo",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "calendarioComReservaEEventoIncompativelSaoProtegidos",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "permissoesECsrf",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "administradorCadastraEEditaReservaSemConflitarComElaMesma",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "cadastroClienteValidaDuplicidadeConfirmacaoEPerfil",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "duasEdicoesConcorrentesNaoOcupamMesmoDestino",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "fotoInvalidaNaoAlteraRegistroExistente",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "reservasCriacaoTransicoesEIsolamentoPelasRotas",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "tokenInvalidoEContaExcluidaPerdemAcesso",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "paginasPublicasEArquivosVisuaisExistem",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "reservaCalendarioConflitoEntradaSaidaEAvaliacao",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "redefinirSenhaConfereAtualEConfirmacaoSemAlterarDadosEmFalhas",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "edicaoMudaDataELiberaEspacoAnterior",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "paginasComReservasEAvaliacoesRenderizamNoNovoVisual",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "prainhasExclusaoOrfaVinculosENaoEncontradas",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "senhaNovaRevogaTodosOsTokensAnterioresEPermiteNovoLogin",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "calendarioEEventosCrudPelasRotas",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "administradoresCadastroEdicaoExclusaoEProtecaoPropriaConta",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "edicaoDeReservaEmUsoOuCanceladaEPermissoes",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "reservasConcorrentesNaoDuplicam",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "formulariosInvalidosNaoPersistem",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "avaliacaoCriacaoValidacaoExclusaoEPosse",
+      "resultado": "aprovado"
+    },
+    {
+      "classe": "br.com.tcc.aqualeve.FluxosIntegrationTests",
+      "teste": "salvarConsultarEditarFotoERemover",
+      "resultado": "aprovado"
+    }
+  ]
+}

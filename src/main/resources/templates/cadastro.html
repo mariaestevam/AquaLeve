@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Criar conta')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('cadastro')}"></header>
+
+<main class="container centro-vertical">
+    <div class="form-card largo">
+        <div class="topo-form">
+            <img class="brand-icon" th:src="@{/imagens/aqualeve-icone.svg}" th:data-fallback="@{/imagens/aqualeve-icone.svg}" onerror="aqFallback(this)"
+                 width="978" height="767" alt="AquaLeve">
+            <h1>Crie sua conta AquaLeve</h1>
+            <p>Um lugar para seus melhores dias ao ar livre.</p>
+        </div>
+
+        <div class="msg erro" th:if="${erro}"><svg class="i"><use href="#i-circle-alert"/></svg><span th:text="${erro}">Erro</span></div>
+
+        <form th:action="@{/cadastro}" th:object="${cadastroForm}" method="post" novalidate>
+            <div class="campo" th:classappend="${#fields.hasErrors('nome')} ? 'com-erro'">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" th:field="*{nome}" autocomplete="name">
+                <small class="erro-campo" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+            </div>
+            <div class="linha-form">
+                <div class="campo" th:classappend="${#fields.hasErrors('telefone')} ? 'com-erro'">
+                    <label for="telefone">Telefone</label>
+                    <input type="text" id="telefone" th:field="*{telefone}" placeholder="(17) 99999-9999" inputmode="tel" autocomplete="tel">
+                    <small class="erro-campo" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></small>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('cpf')} ? 'com-erro'">
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpf" th:field="*{cpf}" placeholder="000.000.000-00" inputmode="numeric">
+                    <small class="erro-campo" th:if="${#fields.hasErrors('cpf')}" th:errors="*{cpf}"></small>
+                </div>
+            </div>
+            <div class="campo" style="margin-top:16px" th:classappend="${#fields.hasErrors('email')} ? 'com-erro'">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" th:field="*{email}" placeholder="voce@exemplo.com" autocomplete="email">
+                <small class="erro-campo" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+            </div>
+            <div class="linha-form">
+                <div class="campo" th:classappend="${#fields.hasErrors('senha')} ? 'com-erro'">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" th:field="*{senha}" autocomplete="new-password" placeholder="Pelo menos 8 caracteres">
+                    <small class="erro-campo" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></small>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('confirmarSenha')} ? 'com-erro'">
+                    <label for="confirmarSenha">Confirmar senha</label>
+                    <input type="password" id="confirmarSenha" th:field="*{confirmarSenha}" autocomplete="new-password">
+                    <small class="erro-campo" th:if="${#fields.hasErrors('confirmarSenha')}" th:errors="*{confirmarSenha}"></small>
+                </div>
+            </div>
+            <button class="btn btn-lg btn-bloco" style="margin-top:24px" type="submit"><svg class="i"><use href="#i-arrow-right"/></svg>Criar conta</button>
+        </form>
+        <p class="form-rodape">Já tem uma conta? <a class="btn-link" th:href="@{/login}">Entrar</a></p>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

@@ -1,0 +1,4 @@
+HTTP: responsável da prainha e criação/edição de reserva pelo administrador PASS
+HTTP: senha atual conferida, troca, revogação de cookie antigo e novo login PASS
+HTTP: foto pré-existente preservada após atualização do esquema PASS
+ALINHAMENTO HTTP PASS

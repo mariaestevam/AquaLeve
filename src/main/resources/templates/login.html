@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Entrar')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('login')}"></header>
+
+<main class="container centro-vertical">
+    <div class="form-card">
+        <div class="topo-form">
+            <img class="brand-icon" th:src="@{/imagens/aqualeve-icone.svg}" th:data-fallback="@{/imagens/aqualeve-icone.svg}" onerror="aqFallback(this)"
+                 width="978" height="767" alt="AquaLeve">
+            <h1>Seu próximo passeio começa aqui</h1>
+            <p>Entre na sua conta para continuar. Administradores também entram por aqui.</p>
+        </div>
+
+        <div class="msg info" th:if="${param.logout}"><svg class="i"><use href="#i-info"/></svg>Você saiu da sua conta.</div>
+        <div class="msg sucesso" th:if="${sucesso}"><svg class="i"><use href="#i-circle-check"/></svg><span th:text="${sucesso}">Cadastro realizado.</span></div>
+        <div class="msg erro" th:if="${erro}"><svg class="i"><use href="#i-circle-alert"/></svg><span th:text="${erro}">E-mail ou senha inválidos.</span></div>
+
+        <form th:action="@{/login}" th:object="${loginForm}" method="post" novalidate class="form-pilha">
+            <div class="campo" th:classappend="${#fields.hasErrors('email')} ? 'com-erro'">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" th:field="*{email}" autocomplete="username" placeholder="voce@exemplo.com">
+                <small class="erro-campo" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+            </div>
+            <div class="campo" th:classappend="${#fields.hasErrors('senha')} ? 'com-erro'">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" th:field="*{senha}" autocomplete="current-password" placeholder="Pelo menos 8 caracteres">
+                <small class="erro-campo" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></small>
+            </div>
+            <button class="btn btn-lg btn-bloco" type="submit"><svg class="i"><use href="#i-arrow-right"/></svg>Entrar</button>
+        </form>
+
+        <div class="separador-ou">ou</div>
+        <a class="btn btn-outline btn-lg btn-bloco" th:href="@{/cadastro}"><svg class="i"><use href="#i-user-plus"/></svg>Criar minha conta</a>
+        <p class="form-rodape">Ainda não tem conta? <a class="btn-link" th:href="@{/cadastro}">Cadastre-se</a></p>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

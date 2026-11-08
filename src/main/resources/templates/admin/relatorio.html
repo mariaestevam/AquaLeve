@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Relatório')}"></head><body>
+<header th:replace="~{fragmentos/layout :: menu('admin')}"></header><main class="container pagina-estreita">
+<div th:replace="~{fragmentos/layout :: adminTopo('relatorios')}"></div><h2>Relatório administrativo</h2>
+<form class="painel" th:action="@{/admin/relatorios}" method="get">
+<label>De <input type="date" name="inicio" th:value="${inicio}"></label>
+<label>Até <input type="date" name="fim" th:value="${fim}"></label>
+<button class="btn" type="submit">Filtrar</button>
+<a class="btn btn-outline" th:href="@{/admin/relatorios/csv(inicio=${inicio},fim=${fim})}">Baixar CSV</a>
+<a class="btn btn-outline" th:href="@{/admin}">Painel</a>
+</form>
+<div class="painel"><p>Total: <strong th:text="${total}"></strong> · Confirmadas: <strong th:text="${confirmadas}"></strong> · Em uso: <strong th:text="${emUso}"></strong> · Finalizadas: <strong th:text="${finalizadas}"></strong> · Canceladas: <strong th:text="${canceladas}"></strong></p></div>
+<div class="painel" style="overflow-x:auto"><table class="admin-table"><thead><tr><th>Reserva</th><th>Prainha</th><th>Cliente</th><th>Data</th><th>Espaço</th><th>Pessoas</th><th>Status</th></tr></thead>
+<tbody><tr th:each="r : ${reservas}"><td th:text="${r.numeroReserva}"></td><td th:text="${r.prainha.nomePrainha}"></td><td th:text="${r.cliente.nomeCliente}"></td><td th:text="${#temporals.format(r.dataHora,'dd/MM/yyyy HH:mm')}"></td><td th:text="${r.tipoReserva}"></td><td th:text="${r.capacidadeReserva}"></td><td th:text="${r.status}"></td></tr></tbody></table>
+<p th:if="${reservas.isEmpty()}">Nenhuma reserva no período.</p></div>
+</main><footer th:replace="~{fragmentos/layout :: rodape}"></footer></body></html>

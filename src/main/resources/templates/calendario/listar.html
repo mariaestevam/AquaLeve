@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/layout :: cabecalho('Calendário de disponibilidade')}"></head>
+<body>
+<header th:replace="~{fragmentos/layout :: menu('admin')}"></header>
+<div th:replace="~{fragmentos/layout :: mensagens}"></div>
+
+<main class="container pagina-estreita">
+    <div th:replace="~{fragmentos/layout :: adminTopo('calendario')}"></div>
+
+    <div class="painel">
+        <div class="painel-titulo">
+            <svg class="i i-lg cor-agua"><use href="#i-calendar-plus"/></svg>
+            <h2>Liberar uma data</h2>
+        </div>
+        <p class="ajuda" style="margin:-8px 0 16px">Os clientes só conseguem reservar nas datas liberadas aqui.</p>
+        <form th:action="@{/calendarios/salvar}" th:object="${calendarioForm}" method="post" novalidate>
+            <div class="linha-form" style="grid-template-columns:1.4fr 1fr auto;align-items:end">
+                <div class="campo" th:classappend="${#fields.hasErrors('prainhaId')} ? 'com-erro'">
+                    <label for="prainhaId">Prainha</label>
+                    <select id="prainhaId" th:field="*{prainhaId}">
+                        <option value="">Selecione</option>
+                        <option th:each="p : ${prainhas}" th:value="${p.idPrainha}" th:text="${p.nomePrainha + ' — ' + p.cidadePrainha}">Prainha</option>
+                    </select>
+                    <small class="erro-campo" th:if="${#fields.hasErrors('prainhaId')}" th:errors="*{prainhaId}"></small>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('dataDisponivel')} ? 'com-erro'">
+                    <label for="dataDisponivel">Data</label>
+                    <input type="date" id="dataDisponivel" th:field="*{dataDisponivel}">
+                    <small class="erro-campo" th:if="${#fields.hasErrors('dataDisponivel')}" th:errors="*{dataDisponivel}"></small>
+                </div>
+                <button class="btn" type="submit"><svg class="i"><use href="#i-check"/></svg>Liberar data</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="secao-admin-topo"><h2>Datas liberadas</h2><span class="contador" th:text="${datas.size()} + ' datas'">0 datas</span></div>
+    <div class="tabela-rolagem">
+        <table class="admin-table">
+            <thead><tr><th>Prainha</th><th>Cidade</th><th>Data</th><th>Ações</th></tr></thead>
+            <tbody>
+            <tr th:each="d : ${datas}">
+                <td><strong style="font-weight:500" th:text="${d.prainha.nomePrainha}">Prainha</strong></td>
+                <td th:text="${d.prainha.cidadePrainha}">Cidade</td>
+                <td>
+                    <span th:text="${#temporals.format(d.dataDisponivel, 'dd/MM/yyyy')}">01/01/2026</span>
+                    <span class="status status-cancelada" style="margin-left:6px" th:if="${d.dataDisponivel.isBefore(#temporals.createToday())}">Passou</span>
+                </td>
+                <td class="acoes">
+                    <form class="inline" th:action="@{/calendarios/excluir/{id}(id=${d.idCalendario})}" method="post"
+                          data-confirmar="Remover esta data?" data-confirmar-texto="A data deixará de aceitar novas reservas." data-confirmar-ok="Remover data">
+                        <button class="btn btn-ghost btn-icone btn-sm cor-perigo" type="submit" title="Remover data" aria-label="Remover data"><svg class="i"><use href="#i-trash-2"/></svg></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="vazio compacto" th:if="${datas.isEmpty()}">Nenhuma data liberada.</p>
+    </div>
+</main>
+
+<footer th:replace="~{fragmentos/layout :: rodape}"></footer>
+</body>
+</html>

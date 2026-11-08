@@ -1,0 +1,3 @@
+IMAGENS DO AQUALEVE
+Os SVGs e fotos incluídos permitem executar a interface sem downloads adicionais.
+Fotos cadastradas pelo administrador têm prioridade. As demais são ilustrativas.
