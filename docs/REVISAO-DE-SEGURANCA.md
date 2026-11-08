@@ -20,6 +20,8 @@ ClamAV não reproduz os modelos do Microsoft Defender. Nenhum resultado desta an
 
 Em GitHub Actions, a ação manual `Verificar AquaLeve no Windows` tenta atualizar o Microsoft Defender, examinar os fontes e o ZIP e executar `mvn clean verify`. Somente se todas essas etapas terminarem com sucesso será criado um artefato de download. Se o Defender estiver indisponível no runner, a ação falha e não apresenta uma aprovação fictícia.
 
-Essa ação ainda não foi executada nesta entrega. Um resultado aprovado precisa ser observado antes de afirmar que houve aprovação pelo Defender. Atualizações futuras do antivírus ainda podem alterar o resultado.
+A execução inicial [https://github.com/mariaestevam/AquaLeve/actions/runs/42440365904](https://github.com/mariaestevam/AquaLeve/actions/runs/42440365904) concluiu com sucesso a atualização e varredura pelo Microsoft Defender (motor 4.18.26100.4, assinaturas 1.463.184.0) e os 35 testes em Java 17 no Windows. O resultado vale para o commit exibido nessa execução. Consulte a execução correspondente à versão baixada; atualizações futuras do antivírus ainda podem alterar o resultado.
+
+O empacotamento força os finais de linha originais dos blobs Git para que os hashes em `relatorios/SHA256SUMS.txt` sejam reproduzíveis também no Windows. O ZIP fornecido em Releases deve corresponder ao artefato examinado, sem recompactação.
 
 Em caso de nova detecção, manter o bloqueio e submeter o arquivo à análise oficial da Microsoft: https://www.microsoft.com/en-us/wdsi/filesubmission . Não enviar credenciais ou configurações particulares.

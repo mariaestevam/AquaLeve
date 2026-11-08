@@ -2,7 +2,7 @@
 
 Nesta cópia, `mvn verify` foi executado novamente a partir dos fontes sem arquivos de compilação anteriores: 35 testes, zero falhas e zero erros, com H2. O comando `clean` não foi usado nesta validação local devido à indisponibilidade do plugin no cache; requer acesso à internet na máquina de destino. O restante deste documento registra também validações anteriores.
 
-A distribuição não inclui ZIP aninhado nem Maven Wrapper. Consulte `docs/REVISAO-DE-SEGURANCA.md` para limitações da análise antivírus. O fluxo de verificação no Windows está preparado, mas não executado.
+A distribuição não inclui ZIP aninhado nem Maven Wrapper. Consulte `docs/REVISAO-DE-SEGURANCA.md` para limitações da análise antivírus. O fluxo de verificação no Windows foi executado com sucesso: https://github.com/mariaestevam/AquaLeve/actions/runs/42440365904 (Defender e 35 testes). Cada execução informa o commit examinado.
 
 # Validação da entrega
 

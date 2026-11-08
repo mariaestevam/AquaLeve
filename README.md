@@ -8,6 +8,8 @@ Sistema do TCC em **Java 17+, Spring Boot, Thymeleaf e PostgreSQL**. A interface
 
 Este pacote contém o código-fonte e a interface. Não inclui ZIP dentro do projeto nem scripts de download automático do Maven. Requer Maven instalado. A investigação do alerta do Microsoft Defender está em `docs/REVISAO-DE-SEGURANCA.md`; ausência de detecção por outro motor não garante ausência de alertas no Defender.
 
+O resultado da verificação no Windows está em [GitHub Actions](https://github.com/mariaestevam/AquaLeve/actions/workflows/verificacao-windows.yml). O ZIP aprovado é disponibilizado em [Releases](https://github.com/mariaestevam/AquaLeve/releases). A aprovação descreve aquela execução; não garante ausência de novos alertas em outras configurações do antivírus.
+
 ## 1. Pré-requisitos
 
 - JDK 17 ou superior, incluindo o compilador `javac` (não somente JRE).

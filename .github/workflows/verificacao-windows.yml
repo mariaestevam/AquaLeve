@@ -12,7 +12,7 @@ jobs:
       - name: Preparar ZIP somente do codigo-fonte
         shell: pwsh
         run: |
-          git archive --format=zip --prefix=AquaLeve/ --output="$env:RUNNER_TEMP/AquaLeve.zip" HEAD
+          git -c core.autocrlf=false -c core.eol=lf archive --format=zip --prefix=AquaLeve/ --output="$env:RUNNER_TEMP/AquaLeve.zip" HEAD
           if ($LASTEXITCODE -ne 0) { throw 'Falha ao gerar ZIP' }
       - name: Atualizar e verificar com Microsoft Defender
         shell: pwsh
@@ -31,7 +31,7 @@ jobs:
             $deteccoes | Format-List ThreatID, Resources, ActionSuccess
             throw 'Defender registrou deteccao. Artefato nao sera disponibilizado.'
           }
-          Get-FileHash "$env:RUNNER_TEMP/AquaLeve.zip" -Algorithm SHA256
+          Get-FileHash "$env:RUNNER_TEMP/AquaLeve.zip" -Algorithm SHA256 | Format-List Algorithm, Hash, Path
       - name: Testar e compilar em Java 17
         shell: pwsh
         run: |
